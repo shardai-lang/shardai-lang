@@ -1,2 +1,3 @@
 [workspace]
 members = ["shardai-cli", "shardai-syntax"]
+resolver = "3"
