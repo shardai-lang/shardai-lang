@@ -1,0 +1,2 @@
+[workspace]
+members = ["shardai-cli", "shardai-syntax"]
