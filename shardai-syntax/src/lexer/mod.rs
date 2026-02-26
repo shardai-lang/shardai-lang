@@ -70,7 +70,7 @@ impl Lexer {
         let mut literal: Option<LexLiteral> = None;
 
         let c = self.advance()
-            .expect("Lexed out of bounds (this should have been checked)");
+            .expect("Lexer out of bounds (this should have been checked)");
         let token = match c {
             '=' => Some(TokenType::Equals),
             ';' => Some(TokenType::Semicolon),
