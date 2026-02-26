@@ -153,7 +153,6 @@ impl Lexer {
         }
     }
 
-
     // Utils
     fn is_at_end(&self) -> bool {
         self.source_idx >= self.source.len()
