@@ -1,4 +1,5 @@
 use shardai_syntax::lexer::Lexer;
+use shardai_syntax::parser::Parser;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = std::env::args().collect();
@@ -21,8 +22,15 @@ fn run_file(file_path: &String) -> Result<(), Box<dyn std::error::Error>> {
     let mut lexer = Lexer::new(file_contents);
     let tokens = lexer.lex()?;
 
-    for tok in tokens {
+    for tok in &tokens {
         println!("{:?}", tok)
+    }
+
+    let mut parser = Parser::new(tokens);
+    let ast = parser.parse()?;
+
+    for node in &ast {
+        println!("{:?}", node)
     }
 
     Ok(())
