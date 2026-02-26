@@ -1,11 +1,5 @@
 use std::collections::HashMap;
-use std::error::Error;
-use std::fmt::{Debug, Display, Formatter};
 use crate::lexer::token::{Token, TokenType};
-
-mod token;
-
-#[derive(Debug)]
 pub enum LexLiteral {
     Number(f64),
     String(String),
@@ -17,14 +11,10 @@ pub struct LexError {
     line: usize,
     message: String
 }
+use crate::errors::lex_error::LexError;
+use crate::errors::messages::ErrorMessage;
+use crate::literal_value::LiteralValue;
 
-impl Display for LexError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[line {}] {}", self.line, self.message)
-    }
-}
-
-impl Error for LexError {}
 
 pub struct Lexer {
     tkn_start: usize,
@@ -96,7 +86,7 @@ impl Lexer {
                 } else {
                     return Err(LexError {
                         line: self.line,
-                        message: "Unknown character".into()
+                        message: ErrorMessage::UnexpectedChar(c)
                     })
                 }
             }
@@ -132,7 +122,7 @@ impl Lexer {
         let num_str = &self.source[self.tkn_start..self.source_idx];
         num_str.parse::<f64>().map_err(|_| LexError {
             line: self.line,
-            message: "Malformed number".into()
+            message: ErrorMessage::MalformedNumber(num_str.into())
         })
     }
 
@@ -160,10 +150,20 @@ impl Lexer {
 
     fn peek(&self) -> Option<char> {
         self.source.chars().nth(self.source_idx)
+    fn peek(&self) -> Result<&char, LexError> {
+        self.source.get(self.source_idx).ok_or(LexError {
+            line: self.source_idx,
+            message: ErrorMessage::UnexpectedEof
+        })
     }
 
     fn peek_next(&self) -> Option<char> {
         self.source.chars().nth(self.source_idx + 1)
+    fn peek_next(&self) -> Result<&char, LexError> {
+        self.source.get(self.source_idx + 1).ok_or(LexError {
+            line: self.source_idx,
+            message: ErrorMessage::UnexpectedEof
+        })
     }
 
     fn advance(&mut self) -> Option<char> {
