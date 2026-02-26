@@ -1,10 +1,10 @@
-use crate::lexer::LexLiteral;
+use crate::literal_value::LiteralValue;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Token {
     pub lexeme: String,
     pub token_type: TokenType,
-    pub literal: Option<LexLiteral>,
+    pub literal: Option<LiteralValue>,
 
     pub start: usize,
     pub length: usize,

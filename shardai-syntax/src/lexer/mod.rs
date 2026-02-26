@@ -1,16 +1,5 @@
 use std::collections::HashMap;
 use crate::lexer::token::{Token, TokenType};
-pub enum LexLiteral {
-    Number(f64),
-    String(String),
-    Nil
-}
-
-#[derive(Clone, Debug)]
-pub struct LexError {
-    line: usize,
-    message: String
-}
 use crate::errors::lex_error::LexError;
 use crate::errors::messages::ErrorMessage;
 use crate::literal_value::LiteralValue;
@@ -57,7 +46,7 @@ impl Lexer {
 
     // Lex methods
     fn lex_token(&mut self) -> Result<Option<Token>, LexError> {
-        let mut literal: Option<LexLiteral> = None;
+        let mut literal: Option<LiteralValue> = None;
 
         let c = self.advance()
             .expect("Lexer out of bounds (this should have been checked)");
@@ -73,15 +62,15 @@ impl Lexer {
 
             // not a symbol
             _ => {
-                if self.is_digit(c) {
+                if self.is_digit(&c) {
                     let number = self.number()?;
 
-                    literal = Some(LexLiteral::Number(number));
+                    literal = Some(LiteralValue::Number(number));
                     Some(TokenType::Number)
                 } else if self.is_letter(c) {
                     let (identifier, token_type) = self.identifier()?;
 
-                    literal = Some(LexLiteral::String(identifier));
+                    literal = Some(LiteralValue::String(identifier));
                     Some(token_type)
                 } else {
                     return Err(LexError {
