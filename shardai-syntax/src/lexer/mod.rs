@@ -4,11 +4,12 @@ use crate::errors::lex_error::LexError;
 use crate::errors::messages::ErrorMessage;
 use crate::literal_value::LiteralValue;
 
+pub mod token;
 
 pub struct Lexer {
     tkn_start: usize,
     source_idx: usize,
-    source: String,
+    source: Vec<char>,
 
     line: usize,
     keywords: HashMap<String, TokenType>
@@ -21,7 +22,7 @@ impl Lexer {
         ]);
 
         Self {
-            source,
+            source: source.chars().collect(),
             keywords,
             line: 0,
             source_idx: 0,
@@ -41,6 +42,7 @@ impl Lexer {
             }
         }
 
+        tokens.push(Token::eof(self.source.len()));
         Ok(tokens)
     }
 
@@ -48,8 +50,7 @@ impl Lexer {
     fn lex_token(&mut self) -> Result<Option<Token>, LexError> {
         let mut literal: Option<LiteralValue> = None;
 
-        let c = self.advance()
-            .expect("Lexer out of bounds (this should have been checked)");
+        let c = self.advance()?;
         let token = match c {
             '=' => Some(TokenType::Equals),
             ';' => Some(TokenType::Semicolon),
@@ -67,7 +68,7 @@ impl Lexer {
 
                     literal = Some(LiteralValue::Number(number));
                     Some(TokenType::Number)
-                } else if self.is_letter(c) {
+                } else if self.is_letter(&c) {
                     let (identifier, token_type) = self.identifier()?;
 
                     literal = Some(LiteralValue::String(identifier));
@@ -82,7 +83,7 @@ impl Lexer {
         };
 
         if let Some(token_type) = token {
-            let lexeme = self.source[self.tkn_start..self.source_idx].into();
+            let lexeme = self.source[self.tkn_start..self.source_idx].iter().collect();
             let length = self.source_idx - self.tkn_start;
 
             Ok(Some(Token { start: self.tkn_start, lexeme, token_type, length, literal }))
@@ -92,39 +93,43 @@ impl Lexer {
     }
 
     // Lex helpers
-    fn consume_digits(&mut self) {
-        while self.peek().map_or(false, |c| self.is_digit(c)) {
-            self.advance();
+    fn consume_digits(&mut self) -> Result<(), LexError> {
+        while self.is_digit(self.peek()?) {
+            self.advance()?;
         }
+
+        Ok(())
     }
 
     fn number(&mut self) -> Result<f64, LexError> {
         // first part of number
-        self.consume_digits();
+        self.consume_digits()?;
 
         // decimal part
-        if self.peek() == Some('.') && self.peek_next().map_or(false, |c| self.is_digit(c)) {
-            self.advance(); // consume "."
-            self.consume_digits();
+        if *self.peek()? == '.' && self.is_digit(self.peek_next()?) {
+            self.advance()?; // consume "."
+            self.consume_digits()?;
         }
 
-        let num_str = &self.source[self.tkn_start..self.source_idx];
+        let num_str: String = self.source[self.tkn_start..self.source_idx].iter().collect();
         num_str.parse::<f64>().map_err(|_| LexError {
             line: self.line,
             message: ErrorMessage::MalformedNumber(num_str.into())
         })
     }
 
-    fn consume_letters(&mut self) {
-        while self.peek().map_or(false, |c| self.is_letter(c)) {
-            self.advance();
+    fn consume_letters(&mut self) -> Result<(), LexError> {
+        while self.is_letter(self.peek()?) {
+            self.advance()?;
         }
+
+        Ok(())
     }
 
     fn identifier(&mut self) -> Result<(String, TokenType), LexError> {
-        self.consume_letters();
+        self.consume_letters()?;
 
-        let word = self.source[self.tkn_start..self.source_idx].to_string();
+        let word = self.source[self.tkn_start..self.source_idx].iter().collect();
         if let Some(kw) = self.keywords.get(&word) {
             Ok((word, kw.clone()))
         } else {
@@ -137,8 +142,6 @@ impl Lexer {
         self.source_idx >= self.source.len()
     }
 
-    fn peek(&self) -> Option<char> {
-        self.source.chars().nth(self.source_idx)
     fn peek(&self) -> Result<&char, LexError> {
         self.source.get(self.source_idx).ok_or(LexError {
             line: self.source_idx,
@@ -146,8 +149,6 @@ impl Lexer {
         })
     }
 
-    fn peek_next(&self) -> Option<char> {
-        self.source.chars().nth(self.source_idx + 1)
     fn peek_next(&self) -> Result<&char, LexError> {
         self.source.get(self.source_idx + 1).ok_or(LexError {
             line: self.source_idx,
@@ -155,19 +156,19 @@ impl Lexer {
         })
     }
 
-    fn advance(&mut self) -> Option<char> {
-        let last = self.peek();
+    fn advance(&mut self) -> Result<char, LexError> {
+        let last = *self.peek()?;
         self.source_idx += 1;
 
-        last
+        Ok(last)
     }
 
     // Type checkers
-    fn is_letter(&self, character: char) -> bool {
+    fn is_letter(&self, character: &char) -> bool {
         matches!(character, 'a'..='z' | 'A'..='Z' | '_')
     }
 
-    fn is_digit(&self, character: char) -> bool {
+    fn is_digit(&self, character: &char) -> bool {
         matches!(character, '0'..='9')
     }
 }

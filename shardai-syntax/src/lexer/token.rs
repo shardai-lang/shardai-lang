@@ -10,11 +10,24 @@ pub struct Token {
     pub length: usize,
 }
 
-#[derive(Clone, Debug)]
+impl Token {
+    pub fn eof(pos: usize) -> Self {
+        Self {
+            literal: None,
+            lexeme: "".into(),
+            token_type: TokenType::Eof,
+            start: pos,
+            length: 0,
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
 pub enum TokenType {
     Equals,
     Semicolon,
     Number,
     Var,
     Identifier,
+    Eof,
 }
