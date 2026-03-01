@@ -4,7 +4,7 @@ use crate::lexer::token::{Token, TokenType};
 use crate::parser::expr::Expr;
 use crate::parser::stmt::Stmt;
 
-pub mod stmt;
+mod stmt;
 mod expr;
 
 pub struct Parser {
