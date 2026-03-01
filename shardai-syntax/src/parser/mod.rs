@@ -84,6 +84,12 @@ impl Parser {
     fn primary(&mut self) -> Result<Expr, ParseError> {
         if match_token!(self, TokenType::Number) {
             return Ok(Expr::Literal(self.previous().literal.clone().unwrap()))
+        } else if match_token!(self, TokenType::True) {
+            return Ok(Expr::Literal(LiteralValue::Bool(true)))
+        } else if match_token!(self, TokenType::False) {
+            return Ok(Expr::Literal(LiteralValue::Bool(false)))
+        } else if match_token!(self, TokenType::Nil) {
+            return Ok(Expr::Literal(LiteralValue::Nil))
         }
 
         Err(ParseError {
