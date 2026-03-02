@@ -1,6 +1,7 @@
 use crate::errors::messages::ErrorMessage;
 use crate::errors::parse_error::ParseError;
 use crate::lexer::token::{Token, TokenType};
+use crate::literal_value::LiteralValue;
 use crate::parser::expr::Expr;
 use crate::parser::stmt::Stmt;
 
