@@ -30,4 +30,7 @@ pub enum TokenType {
     Var,
     Identifier,
     Eof,
+    True,
+    False,
+    Nil
 }
