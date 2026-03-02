@@ -18,7 +18,10 @@ pub struct Lexer {
 impl Lexer {
     pub fn new(source: String) -> Self {
         let keywords: HashMap<String, TokenType> = HashMap::from([
-            ("var".into(), TokenType::Var)
+            ("var".into(), TokenType::Var),
+            ("true".into(), TokenType::True),
+            ("false".into(), TokenType::False),
+            ("nil".into(), TokenType::Nil),
         ]);
 
         Self {
