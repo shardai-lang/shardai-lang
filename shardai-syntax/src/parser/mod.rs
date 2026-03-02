@@ -5,8 +5,8 @@ use crate::literal_value::LiteralValue;
 use crate::parser::expr::Expr;
 use crate::parser::stmt::Stmt;
 
-mod stmt;
-mod expr;
+pub mod stmt;
+pub mod expr;
 
 pub struct Parser {
     tokens: Vec<Token>,
