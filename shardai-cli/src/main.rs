@@ -32,6 +32,6 @@ fn run_file(file_path: &String) -> Result<(), Box<dyn std::error::Error>> {
     for node in &ast {
         println!("{:?}", node)
     }
-
+    
     Ok(())
 }
