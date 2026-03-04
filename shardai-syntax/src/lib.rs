@@ -9,10 +9,6 @@ pub mod parser;
 pub mod errors;
 mod literal_value;
 
-pub fn parse_ast(ast: Vec<Stmt>) {
-
-}
-
 pub fn parse_source(source: String) -> Result<Vec<Stmt>, Box<dyn std::error::Error>> {
     let mut lexer = Lexer::new(source);
     let tokens = lexer.lex()?;
