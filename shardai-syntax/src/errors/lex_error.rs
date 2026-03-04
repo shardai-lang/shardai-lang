@@ -1,3 +1,5 @@
+// Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
+
 use std::error::Error;
 use std::fmt::{Display, Formatter};
 use crate::errors::messages::ErrorMessage;

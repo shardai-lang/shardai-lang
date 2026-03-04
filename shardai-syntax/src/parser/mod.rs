@@ -1,3 +1,5 @@
+// Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
+
 use crate::errors::messages::ErrorMessage;
 use crate::errors::parse_error::ParseError;
 use crate::lexer::token::{Token, TokenType};
