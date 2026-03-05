@@ -58,9 +58,8 @@ impl Parser {
         self.statement()
     }
 
-    // Todo: implement statements in future
     fn statement(&self) -> Result<Stmt, ParseError> {
-        todo!()
+        todo!("https://github.com/shardai-lang/shardai-lang/issues/2")
     }
 
     fn var_declaration(&mut self) -> Result<Stmt, ParseError> {
