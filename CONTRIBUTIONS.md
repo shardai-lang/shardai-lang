@@ -11,7 +11,7 @@ Big thanks for your interest in contributing to Shardai!
 * Documentation: improving the README, adding code comments, etc.
 
 > [!WARNING]
-> Large features or redesigns of core systems aren't being accepted yet as the language design isn't stable yet.
+> Large features or redesigns of core systems aren't being accepted as the language design isn't stable yet.
 > If you have ideas, please open an issue first.
 
 ## Bug reports:
