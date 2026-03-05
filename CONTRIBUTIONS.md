@@ -1,7 +1,7 @@
 Big thanks for your interest in contributing to Shardai!
 
 > [!WARNING]
-> Shardai is currently in very early development, and the internals change frequently.
+> Shardai is currently in very early development, and the internals change frequently.<br>
 > Before you contribute, note that core systems like the bytecode format, AST structure, VM design, etc. may be redesigned without notice until 1.0.
 
 ## Ways to contribute:
@@ -11,7 +11,7 @@ Big thanks for your interest in contributing to Shardai!
 * Documentation: improving the README, adding code comments, etc.
 
 > [!WARNING]
-> Large features or redesigns of core systems aren't being accepted as the language design isn't stable yet.
+> Large features or redesigns of core systems aren't being accepted as the language design isn't stable yet.<br>
 > If you have ideas, please open an issue first.
 
 ## Bug reports:
