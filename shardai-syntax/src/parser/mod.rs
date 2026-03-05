@@ -52,10 +52,6 @@ impl Parser {
     // Statement parsers
     // These can only appear in the top level of a program:
     fn declaration(&mut self) -> Result<Stmt, ParseError> {
-        if match_token!(self, TokenType::Var) {
-            return self.var_declaration();
-        }
-
         self.statement()
     }
 
