@@ -129,7 +129,7 @@ impl Lexer {
             .collect();
         num_str.parse::<f64>().map_err(|_| LexError {
             line: self.line,
-            message: ErrorMessage::MalformedNumber(num_str.into()),
+            message: ErrorMessage::MalformedNumber(num_str),
         })
     }
 
@@ -186,6 +186,6 @@ impl Lexer {
     }
 
     fn is_digit(&self, character: &char) -> bool {
-        matches!(character, '0'..='9')
+        character.is_ascii_digit()
     }
 }
