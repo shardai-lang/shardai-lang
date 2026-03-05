@@ -9,4 +9,8 @@ pub enum Stmt {
         name: Token,
         initializer: Option<Expr>,
     },
+    Assign {
+        target: Expr,
+        value: Expr
+    }
 }
