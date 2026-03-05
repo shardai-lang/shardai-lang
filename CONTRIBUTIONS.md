@@ -10,7 +10,7 @@ Big thanks for your interest in contributing to Shardai!
 * Discussion: feedback on opened issues
 * Documentation: improving the README, adding code comments, etc.
 
-> [!WARNING]
+> [!IMPORTANT]
 > Large features or redesigns of core systems aren't being accepted as the language design isn't stable yet.<br>
 > If you have ideas, please open an issue first.
 
