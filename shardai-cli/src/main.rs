@@ -19,7 +19,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn run_repl() -> Result<(), Box<dyn std::error::Error>> {
-    todo!()
+    todo!("https://github.com/shardai-lang/shardai-lang/issues/1")
 }
 
 fn run_file(file_path: &String) -> Result<(), Box<dyn std::error::Error>> {
