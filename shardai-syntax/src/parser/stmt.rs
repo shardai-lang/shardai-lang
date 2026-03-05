@@ -7,6 +7,6 @@ use crate::parser::expr::Expr;
 pub enum Stmt {
     Var {
         name: Token,
-        initializer: Option<Expr>
-    }
+        initializer: Option<Expr>,
+    },
 }

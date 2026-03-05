@@ -1,10 +1,10 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
-use std::collections::HashMap;
-use crate::lexer::token::{Token, TokenType};
 use crate::errors::lex_error::LexError;
 use crate::errors::messages::ErrorMessage;
+use crate::lexer::token::{Token, TokenType};
 use crate::literal_value::LiteralValue;
+use std::collections::HashMap;
 
 pub mod token;
 
@@ -14,7 +14,7 @@ pub struct Lexer {
     source: Vec<char>,
 
     line: usize,
-    keywords: HashMap<String, TokenType>
+    keywords: HashMap<String, TokenType>,
 }
 
 impl Lexer {
@@ -31,7 +31,7 @@ impl Lexer {
             keywords,
             line: 0,
             source_idx: 0,
-            tkn_start: 0
+            tkn_start: 0,
         }
     }
 
@@ -64,7 +64,7 @@ impl Lexer {
             '\n' => {
                 self.line += 1;
                 None
-            },
+            }
 
             // not a symbol
             _ => {
@@ -81,17 +81,25 @@ impl Lexer {
                 } else {
                     return Err(LexError {
                         line: self.line,
-                        message: ErrorMessage::UnexpectedChar(c)
-                    })
+                        message: ErrorMessage::UnexpectedChar(c),
+                    });
                 }
             }
         };
 
         if let Some(token_type) = token {
-            let lexeme = self.source[self.tkn_start..self.source_idx].iter().collect();
+            let lexeme = self.source[self.tkn_start..self.source_idx]
+                .iter()
+                .collect();
             let length = self.source_idx - self.tkn_start;
 
-            Ok(Some(Token { start: self.tkn_start, lexeme, token_type, length, literal }))
+            Ok(Some(Token {
+                start: self.tkn_start,
+                lexeme,
+                token_type,
+                length,
+                literal,
+            }))
         } else {
             Ok(None)
         }
@@ -116,10 +124,12 @@ impl Lexer {
             self.consume_digits()?;
         }
 
-        let num_str: String = self.source[self.tkn_start..self.source_idx].iter().collect();
+        let num_str: String = self.source[self.tkn_start..self.source_idx]
+            .iter()
+            .collect();
         num_str.parse::<f64>().map_err(|_| LexError {
             line: self.line,
-            message: ErrorMessage::MalformedNumber(num_str.into())
+            message: ErrorMessage::MalformedNumber(num_str.into()),
         })
     }
 
@@ -134,7 +144,9 @@ impl Lexer {
     fn identifier(&mut self) -> Result<(String, TokenType), LexError> {
         self.consume_letters()?;
 
-        let word = self.source[self.tkn_start..self.source_idx].iter().collect();
+        let word = self.source[self.tkn_start..self.source_idx]
+            .iter()
+            .collect();
         if let Some(kw) = self.keywords.get(&word) {
             Ok((word, kw.clone()))
         } else {
@@ -150,14 +162,14 @@ impl Lexer {
     fn peek(&self) -> Result<&char, LexError> {
         self.source.get(self.source_idx).ok_or(LexError {
             line: self.source_idx,
-            message: ErrorMessage::UnexpectedEof
+            message: ErrorMessage::UnexpectedEof,
         })
     }
 
     fn peek_next(&self) -> Result<&char, LexError> {
         self.source.get(self.source_idx + 1).ok_or(LexError {
             line: self.source_idx,
-            message: ErrorMessage::UnexpectedEof
+            message: ErrorMessage::UnexpectedEof,
         })
     }
 

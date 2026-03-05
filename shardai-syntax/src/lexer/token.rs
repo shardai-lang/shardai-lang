@@ -34,5 +34,5 @@ pub enum TokenType {
     Eof,
     True,
     False,
-    Nil
+    Nil,
 }

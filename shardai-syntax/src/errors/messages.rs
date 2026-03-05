@@ -20,7 +20,7 @@ impl Display for ErrorMessage {
             Self::ExpectedIdentifier(s) => write!(f, "Expected identifier after '{}'", s),
             Self::MalformedNumber(s) => write!(f, "Malformed number '{}'", s),
             Self::ExpectedChar(c) => write!(f, "Expected character '{}'", c),
-            Self::ExpectedExpression => write!(f, "Expected expression")
+            Self::ExpectedExpression => write!(f, "Expected expression"),
         }
     }
 }

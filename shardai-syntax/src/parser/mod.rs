@@ -7,12 +7,12 @@ use crate::literal_value::LiteralValue;
 use crate::parser::expr::Expr;
 use crate::parser::stmt::Stmt;
 
-pub mod stmt;
 pub mod expr;
+pub mod stmt;
 
 pub struct Parser {
     tokens: Vec<Token>,
-    current: usize
+    current: usize,
 }
 
 macro_rules! match_token {
@@ -52,7 +52,7 @@ impl Parser {
     // Statement parsers
     fn declaration(&mut self) -> Result<Stmt, ParseError> {
         if match_token!(self, TokenType::Var) {
-            return self.var_declaration()
+            return self.var_declaration();
         }
 
         self.statement()
@@ -64,7 +64,12 @@ impl Parser {
     }
 
     fn var_declaration(&mut self) -> Result<Stmt, ParseError> {
-        let name = self.consume(TokenType::Identifier, ErrorMessage::ExpectedIdentifier("var"))?.clone();
+        let name = self
+            .consume(
+                TokenType::Identifier,
+                ErrorMessage::ExpectedIdentifier("var"),
+            )?
+            .clone();
 
         let initializer = if match_token!(self, TokenType::Equals) {
             Some(self.expression()?)
@@ -86,18 +91,18 @@ impl Parser {
     // Lowest level parser
     fn primary(&mut self) -> Result<Expr, ParseError> {
         if match_token!(self, TokenType::Number) {
-            return Ok(Expr::Literal(self.previous().literal.clone().unwrap()))
+            return Ok(Expr::Literal(self.previous().literal.clone().unwrap()));
         } else if match_token!(self, TokenType::True) {
-            return Ok(Expr::Literal(LiteralValue::Bool(true)))
+            return Ok(Expr::Literal(LiteralValue::Bool(true)));
         } else if match_token!(self, TokenType::False) {
-            return Ok(Expr::Literal(LiteralValue::Bool(false)))
+            return Ok(Expr::Literal(LiteralValue::Bool(false)));
         } else if match_token!(self, TokenType::Nil) {
-            return Ok(Expr::Literal(LiteralValue::Nil))
+            return Ok(Expr::Literal(LiteralValue::Nil));
         }
 
         Err(ParseError {
             token: self.peek().clone(),
-            message: ErrorMessage::ExpectedExpression
+            message: ErrorMessage::ExpectedExpression,
         })
     }
 
@@ -107,41 +112,49 @@ impl Parser {
     }
 
     fn peek(&self) -> &Token {
-        self.tokens.get(self.current)
+        self.tokens
+            .get(self.current)
             .unwrap_or_else(|| self.tokens.last().expect("Token stream is empty"))
     }
 
     fn previous(&self) -> &Token {
-        self.tokens.get(self.current - 1)
+        self.tokens
+            .get(self.current - 1)
             .unwrap_or_else(|| self.tokens.last().expect("Token stream is empty"))
     }
 
     fn advance(&mut self) -> Result<&Token, ParseError> {
         if !self.is_at_end() {
             self.current += 1;
-            
+
             Ok(self.tokens.get(self.current - 1).unwrap())
         } else {
             Err(ParseError {
                 token: self.peek().clone(),
-                message: ErrorMessage::UnexpectedEof
+                message: ErrorMessage::UnexpectedEof,
             })
         }
     }
 
     fn check(&self, token_type: TokenType) -> Result<bool, ParseError> {
-        if self.is_at_end() { return Ok(false) }
+        if self.is_at_end() {
+            return Ok(false);
+        }
 
         Ok(self.peek().token_type == token_type)
     }
 
-    fn consume(&mut self, token_type: TokenType, message: ErrorMessage) -> Result<&Token, ParseError> {
+    fn consume(
+        &mut self,
+        token_type: TokenType,
+        message: ErrorMessage,
+    ) -> Result<&Token, ParseError> {
         if self.check(token_type)? {
             self.advance()
         } else {
             Err(ParseError {
                 token: self.peek().clone(),
-                message
+                message,
             })
         }
     }

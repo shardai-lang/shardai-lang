@@ -8,10 +8,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // the first argument is always the executable name
     match args.len() {
-        1 => run_repl(), // no arguments were passed
+        1 => run_repl(),         // no arguments were passed
         2 => run_file(&args[1]), // (what we can assume to be) a file was passed
 
-        _ => { println!("usage: {} file_path", args[0]); Ok(()) }
+        _ => {
+            println!("usage: {} file_path", args[0]);
+            Ok(())
+        }
     }
 }
 
@@ -34,6 +37,6 @@ fn run_file(file_path: &String) -> Result<(), Box<dyn std::error::Error>> {
     for node in &ast {
         println!("{:?}", node)
     }
-    
+
     Ok(())
 }

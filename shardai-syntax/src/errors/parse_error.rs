@@ -1,14 +1,14 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
-use std::error::Error;
-use std::fmt::{Display, Formatter};
 use crate::errors::messages::ErrorMessage;
 use crate::lexer::token::Token;
+use std::error::Error;
+use std::fmt::{Display, Formatter};
 
 #[derive(Debug)]
 pub struct ParseError {
     pub token: Token,
-    pub message: ErrorMessage
+    pub message: ErrorMessage,
 }
 
 impl Error for ParseError {}
