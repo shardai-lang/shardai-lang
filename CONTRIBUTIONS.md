@@ -51,3 +51,13 @@ cargo build
 5. Once merged, delete your branch
 
 For anything more than a small bug fix, open an issue and discuss your approach before writing code. This avoids wasted effort if the approach doesn't fit the project
+
+## Branch naming:
+| Prefix      | Use                                      |
+|-------------|------------------------------------------|
+| `feat/`     | New feature                              |
+| `fix/`      | Bug fix                                  |
+| `refactor/` | Internal changes, no user-visible effect |
+| `docs/`     | Documentation only                       |
+
+External contributors working from a fork don't have to follow these names and can name their branches whatever they like.
