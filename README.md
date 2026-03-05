@@ -1,6 +1,6 @@
 <div align="center">
-    <img src="assets/logo-dark.png#gh-light-mode-only" alt="Shardai" width="300">
-    <img src="assets/logo-light.png#gh-dark-mode-only" alt="Shardai" width="300">
+    <img src="assets/logo-dark.png#gh-light-mode-only" alt="Shardai" width="450">
+    <img src="assets/logo-light.png#gh-dark-mode-only" alt="Shardai" width="450">
     <br/><br/>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
     <a><img src="https://img.shields.io/badge/status-pre--alpha-orange.svg"/></a>
