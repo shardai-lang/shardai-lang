@@ -32,5 +32,5 @@ Very early development. Expect breaking changes until 1.0.
 ## License
 Licensed under the Apache License Version 2.0.
 
-## Contributions
-Check out the [contributing guide](CONTRIBUTIONS.md).
+## Contributing
+Check out the [contributing guide](CONTRIBUTING.md).
