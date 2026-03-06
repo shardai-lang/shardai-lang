@@ -15,6 +15,6 @@ impl Error for ParseError {}
 
 impl Display for ParseError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "at {}: {}", self.token.lexeme, self.message)
+        write!(f, "(Parse) {}, but got '{}'", self.message, self.token.lexeme)
     }
 }
