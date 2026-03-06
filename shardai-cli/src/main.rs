@@ -3,11 +3,11 @@
 use shardai_syntax::lexer::Lexer;
 use shardai_syntax::parser::Parser;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() {
     let args: Vec<String> = std::env::args().collect();
 
     // the first argument is always the executable name
-    match args.len() {
+    let result = match args.len() {
         1 => run_repl(),         // no arguments were passed
         2 => run_file(&args[1]), // (what we can assume to be) a file was passed
 
@@ -15,6 +15,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("usage: {} file_path", args[0]);
             Ok(())
         }
+    };
+
+    if let Err(e) = result {
+        eprintln!("{}", e)
     }
 }
 
