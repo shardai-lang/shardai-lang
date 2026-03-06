@@ -55,8 +55,29 @@ impl Parser {
         self.statement()
     }
 
-    fn statement(&self) -> Result<Stmt, ParseError> {
-        todo!("https://github.com/shardai-lang/shardai-lang/issues/2")
+    // https://github.com/shardai-lang/shardai-lang/issues/2
+    // These can appear inside code blocks, or the top level of a program.
+    fn statement(&mut self) -> Result<Stmt, ParseError> {
+        if match_token!(self, TokenType::Var) {
+            return self.var_declaration()
+        }
+
+        self.expression_statement()
+    }
+
+    // This handles things like `x = 5`, or wraps the expression in a Stmt
+    fn expression_statement(&mut self) -> Result<Stmt, ParseError> {
+        let target = self.expression()?;
+
+        if match_token!(self, TokenType::Equals) {
+            let value = self.expression()?;
+
+            self.consume(TokenType::Semicolon, ErrorMessage::ExpectedChar(';'))?;
+            return Ok(Stmt::Assign { target, value })
+        }
+
+        self.consume(TokenType::Semicolon, ErrorMessage::ExpectedChar(';'))?;
+        Ok(Stmt::Expr(target))
     }
 
     fn var_declaration(&mut self) -> Result<Stmt, ParseError> {
