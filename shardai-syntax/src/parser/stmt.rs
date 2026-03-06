@@ -12,6 +12,6 @@ pub enum Stmt {
     },
     Assign {
         target: Expr,
-        value: Expr
-    }
+        value: Expr,
+    },
 }

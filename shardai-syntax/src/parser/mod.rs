@@ -59,7 +59,7 @@ impl Parser {
     // These can appear inside code blocks, or the top level of a program.
     fn statement(&mut self) -> Result<Stmt, ParseError> {
         if match_token!(self, TokenType::Var) {
-            return self.var_declaration()
+            return self.var_declaration();
         }
 
         self.expression_statement()
@@ -73,7 +73,7 @@ impl Parser {
             let value = self.expression()?;
 
             self.consume(TokenType::Semicolon, ErrorMessage::ExpectedChar(';'))?;
-            return Ok(Stmt::Assign { target, value })
+            return Ok(Stmt::Assign { target, value });
         }
 
         self.consume(TokenType::Semicolon, ErrorMessage::ExpectedChar(';'))?;
@@ -116,7 +116,7 @@ impl Parser {
         } else if match_token!(self, TokenType::Nil) {
             return Ok(Expr::Literal(LiteralValue::Nil));
         } else if match_token!(self, TokenType::Identifier) {
-            return Ok(Expr::Identifier(self.previous().clone()))
+            return Ok(Expr::Identifier(self.previous().clone()));
         }
 
         Err(ParseError {
