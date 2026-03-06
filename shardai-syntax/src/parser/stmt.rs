@@ -5,6 +5,7 @@ use crate::parser::expr::Expr;
 
 #[derive(Debug)]
 pub enum Stmt {
+    Expr(Expr),
     Var {
         name: Token,
         initializer: Option<Expr>,
