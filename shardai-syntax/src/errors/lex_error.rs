@@ -6,13 +6,13 @@ use std::fmt::{Display, Formatter};
 
 #[derive(Debug)]
 pub struct LexError {
-    pub line: usize,
+    pub position: usize,
     pub message: ErrorMessage,
 }
 
 impl Display for LexError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[line {}] {}", self.line, self.message)
+        write!(f, "(Lex) {}, at position {}", self.message, self.position)
     }
 }
 

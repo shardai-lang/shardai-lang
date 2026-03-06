@@ -80,7 +80,7 @@ impl Lexer {
                     Some(token_type)
                 } else {
                     return Err(LexError {
-                        line: self.line,
+                        position: self.source_idx,
                         message: ErrorMessage::UnexpectedChar(c),
                     });
                 }
@@ -128,7 +128,7 @@ impl Lexer {
             .iter()
             .collect();
         num_str.parse::<f64>().map_err(|_| LexError {
-            line: self.line,
+            position: self.source_idx,
             message: ErrorMessage::MalformedNumber(num_str),
         })
     }
@@ -161,14 +161,14 @@ impl Lexer {
 
     fn peek(&self) -> Result<&char, LexError> {
         self.source.get(self.source_idx).ok_or(LexError {
-            line: self.source_idx,
+            position: self.source_idx,
             message: ErrorMessage::UnexpectedEof,
         })
     }
 
     fn peek_next(&self) -> Result<&char, LexError> {
         self.source.get(self.source_idx + 1).ok_or(LexError {
-            line: self.source_idx,
+            position: self.source_idx,
             message: ErrorMessage::UnexpectedEof,
         })
     }
