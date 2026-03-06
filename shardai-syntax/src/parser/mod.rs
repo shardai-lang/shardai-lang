@@ -50,16 +50,34 @@ impl Parser {
     }
 
     // Statement parsers
+    // These can only appear in the top level of a program:
     fn declaration(&mut self) -> Result<Stmt, ParseError> {
+        self.statement()
+    }
+
+    // https://github.com/shardai-lang/shardai-lang/issues/2
+    // These can appear inside code blocks, or the top level of a program.
+    fn statement(&mut self) -> Result<Stmt, ParseError> {
         if match_token!(self, TokenType::Var) {
             return self.var_declaration();
         }
 
-        self.statement()
+        self.expression_statement()
     }
 
-    fn statement(&self) -> Result<Stmt, ParseError> {
-        todo!("https://github.com/shardai-lang/shardai-lang/issues/2")
+    // This handles things like `x = 5`, or wraps the expression in a Stmt
+    fn expression_statement(&mut self) -> Result<Stmt, ParseError> {
+        let target = self.expression()?;
+
+        if match_token!(self, TokenType::Equals) {
+            let value = self.expression()?;
+
+            self.consume(TokenType::Semicolon, ErrorMessage::ExpectedChar(';'))?;
+            return Ok(Stmt::Assign { target, value });
+        }
+
+        self.consume(TokenType::Semicolon, ErrorMessage::ExpectedChar(';'))?;
+        Ok(Stmt::Expr(target))
     }
 
     fn var_declaration(&mut self) -> Result<Stmt, ParseError> {
@@ -97,6 +115,8 @@ impl Parser {
             return Ok(Expr::Literal(LiteralValue::Bool(false)));
         } else if match_token!(self, TokenType::Nil) {
             return Ok(Expr::Literal(LiteralValue::Nil));
+        } else if match_token!(self, TokenType::Identifier) {
+            return Ok(Expr::Identifier(self.previous().clone()));
         }
 
         Err(ParseError {
