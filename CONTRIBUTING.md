@@ -50,6 +50,8 @@ cargo build
 4. One approval from a maintainer is required to merge
 5. Once merged, delete your branch
 
+Tip: Make sure to run `cargo fmt` **last**. `cargo clippy` may make changes that violate fmt's rules.<br>
+
 For anything more than a small bug fix, open an issue and discuss your approach before writing code. This avoids wasted effort if the approach doesn't fit the project
 
 ## Branch naming:
