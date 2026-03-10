@@ -1,14 +1,14 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
-use std::collections::HashMap;
+use crate::error::CompileError;
+use shardai_bytecode::constant::Constant;
 use shardai_bytecode::file::BytecodeFile;
 use shardai_bytecode::header::BytecodeHeader;
-use shardai_bytecode::constant::Constant;
 use shardai_bytecode::instruction::Instruction;
 use shardai_bytecode::opcodes::*;
 use shardai_syntax::parser::expr::Expr;
 use shardai_syntax::parser::stmt::Stmt;
-use crate::error::CompileError;
+use std::collections::HashMap;
 
 const VERSION_MAJOR: u8 = 0;
 const VERSION_MINOR: u8 = 0;
@@ -35,13 +35,13 @@ impl Compiler {
             signature: *b"SBC",
             version_major: VERSION_MAJOR,
             version_minor: VERSION_MINOR,
-            constant_count: self.constants.len() as u16
+            constant_count: self.constants.len() as u16,
         }
     }
 
     fn add_constant(&mut self, constant: Constant) -> Result<u8, CompileError> {
         if self.constants.len() >= u8::MAX as usize {
-            return Err(CompileError::TooManyConstants)
+            return Err(CompileError::TooManyConstants);
         }
 
         self.constants.push(constant);
@@ -70,7 +70,7 @@ impl Compiler {
         Ok(BytecodeFile {
             header: self.build_header(),
             constants: self.constants.clone(),
-            instructions: self.instructions.clone()
+            instructions: self.instructions.clone(),
         })
     }
 
@@ -121,10 +121,11 @@ impl Compiler {
 
                 self.emit(Op::LoadConst, dest, const_idx, 0);
                 Ok(dest)
-            },
+            }
 
             Expr::Identifier(token) => {
-                let local = self.get_local(&token.lexeme)
+                let local = self
+                    .get_local(&token.lexeme)
                     .ok_or(CompileError::UnknownLocal(token.lexeme));
 
                 local

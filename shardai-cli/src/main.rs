@@ -1,9 +1,9 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
-use std::fs::File;
 use shardai_compiler::compiler::Compiler;
 use shardai_syntax::lexer::Lexer;
 use shardai_syntax::parser::Parser;
+use std::fs::File;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = std::env::args().collect();

@@ -1,16 +1,16 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
+use shardai_syntax::literal_value::LiteralValue;
 use std::fmt::{Debug, Formatter};
 use std::io;
 use std::io::Write;
-use shardai_syntax::literal_value::LiteralValue;
 
 #[derive(Clone)]
 pub enum Constant {
     String(String),
     Number(f64),
     Bool(bool),
-    Nil
+    Nil,
 }
 
 pub const STRING_TAG: u8 = 0x00;
@@ -28,7 +28,7 @@ impl Constant {
             Constant::Number(n) => {
                 writer.write_all(&[NUMBER_TAG])?; // 1 byte tag
                 writer.write_all(&n.to_le_bytes())?; // 8 byte length (all numbers are f64)
-            },
+            }
             Constant::Bool(n) => {
                 writer.write_all(&[NUMBER_TAG])?; // 1 byte tag
                 writer.write_all(&[*n as u8])?; // 1 byte length (inefficient but whatever)
@@ -59,7 +59,7 @@ impl Debug for Constant {
             Constant::String(s) => write!(f, "Constant({})", s),
             Constant::Number(n) => write!(f, "Constant({})", n),
             Constant::Bool(b) => write!(f, "Constant({})", b),
-            Constant::Nil => write!(f, "Constant(nil)")
+            Constant::Nil => write!(f, "Constant(nil)"),
         }
     }
 }

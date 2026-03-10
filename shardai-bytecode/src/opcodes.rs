@@ -28,5 +28,5 @@ Update instruction.rs if you add a new instruction
 #[derive(Clone, Copy)]
 pub enum Op {
     LoadConst = 0, // reg(a) const(b) -> reg(a) = const(b)
-    Move = 1, // reg(a) reg(b) -> reg(a) = reg(b)
+    Move = 1,      // reg(a) reg(b) -> reg(a) = reg(b)
 }

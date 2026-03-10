@@ -1,9 +1,9 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
-use std::fmt::{write, Debug, Formatter};
+use crate::opcodes::Op;
+use std::fmt::{Debug, Formatter, write};
 use std::io;
 use std::io::Write;
-use crate::opcodes::Op;
 
 #[derive(Clone)]
 pub struct Instruction {
@@ -11,7 +11,7 @@ pub struct Instruction {
 
     pub a: u8,
     pub b: u8,
-    pub c: u8
+    pub c: u8,
 }
 
 impl Instruction {

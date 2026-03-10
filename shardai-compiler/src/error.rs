@@ -6,14 +6,14 @@ use std::fmt::{Display, Formatter};
 #[derive(Debug)]
 pub enum CompileError {
     TooManyConstants,
-    UnknownLocal(String)
+    UnknownLocal(String),
 }
 
 impl Display for CompileError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             CompileError::TooManyConstants => write!(f, "Too many constants"),
-            CompileError::UnknownLocal(s) => write!(f, "Unknown local {}", s)
+            CompileError::UnknownLocal(s) => write!(f, "Unknown local {}", s),
         }
     }
 }
