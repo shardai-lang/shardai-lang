@@ -1,16 +1,12 @@
-mod compiler;
+pub mod compiler;
+mod error;
 
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+use shardai_bytecode::file::BytecodeFile;
+use shardai_syntax::parser::stmt::Stmt;
+use crate::compiler::Compiler;
+use crate::error::CompileError;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+pub fn compile_ast(ast: Vec<Stmt>) -> Result<BytecodeFile, CompileError> {
+    let mut compiler = Compiler::new();
+    compiler.compile(ast)
 }
