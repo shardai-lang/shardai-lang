@@ -1,5 +1,6 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
+use shardai_compiler::compiler::Compiler;
 use shardai_syntax::lexer::Lexer;
 use shardai_syntax::parser::Parser;
 
@@ -37,6 +38,11 @@ fn run_file(file_path: &String) -> Result<(), Box<dyn std::error::Error>> {
     for node in &ast {
         println!("{:?}", node)
     }
+
+    let mut compiler = Compiler::new();
+    let bytecode = compiler.compile(ast)?;
+
+    println!("{:#?}", bytecode);
 
     Ok(())
 }
