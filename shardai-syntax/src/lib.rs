@@ -6,7 +6,7 @@ use crate::parser::stmt::Stmt;
 
 mod errors;
 pub mod lexer;
-mod literal_value;
+pub mod literal_value;
 pub mod parser;
 
 pub fn parse_source(source: String) -> Result<Vec<Stmt>, Box<dyn std::error::Error>> {
