@@ -20,6 +20,12 @@ pub struct Compiler {
     instructions: Vec<Instruction>,
 }
 
+impl Default for Compiler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Compiler {
     pub fn new() -> Self {
         Self {
@@ -124,11 +130,11 @@ impl Compiler {
             }
 
             Expr::Identifier(token) => {
-                let local = self
-                    .get_local(&token.lexeme)
-                    .ok_or(CompileError::UnknownLocal(token.lexeme));
+                
 
-                local
+                self
+                    .get_local(&token.lexeme)
+                    .ok_or(CompileError::UnknownLocal(token.lexeme))
             }
         }
     }

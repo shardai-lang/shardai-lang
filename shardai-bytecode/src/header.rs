@@ -14,7 +14,7 @@ pub struct BytecodeHeader {
 impl Debug for BytecodeHeader {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let signature =
-            str::from_utf8(&self.signature).unwrap_or_else(|_| "Invalid UTF8 signature");
+            str::from_utf8(&self.signature).unwrap_or("Invalid UTF8 signature");
 
         write!(f, "Signature: {},", signature)?;
         write!(
