@@ -6,7 +6,7 @@ pub struct BytecodeHeader {
     pub signature: [u8; 3], // "SBC" (Shardai bytecode)
     pub version_major: u8,
     pub version_minor: u8,
-    pub constant_count: u32
+    pub constant_count: u16
 }
 
 impl Debug for BytecodeHeader {
