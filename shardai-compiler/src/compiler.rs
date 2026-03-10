@@ -48,7 +48,7 @@ impl Compiler {
         Ok((self.constants.len() - 1) as u8)
     }
 
-    fn emit(&mut self, opcode: u8, a: u8, b: u8, c: u8) {
+    fn emit(&mut self, opcode: Op, a: u8, b: u8, c: u8) {
         let instr = Instruction { opcode, a, b, c };
 
         self.instructions.push(instr)
@@ -91,7 +91,7 @@ impl Compiler {
                 if let Some(init) = initializer {
                     let value_register = self.compile_expr(init)?;
 
-                    self.emit(OP_MOVE, register, value_register, 0);
+                    self.emit(Op::Move, register, value_register, 0);
                 }
 
                 self.register_local(name.lexeme, register)?;
@@ -101,7 +101,7 @@ impl Compiler {
                 let target_register = self.compile_expr(target)?;
                 let value_register = self.compile_expr(value)?;
 
-                self.emit(OP_MOVE, target_register, value_register, 0);
+                self.emit(Op::Move, target_register, value_register, 0);
                 Ok(())
             }
             Stmt::Expr(e) => {
@@ -119,7 +119,7 @@ impl Compiler {
                 let dest = self.next_register;
                 self.next_register += 1;
 
-                self.emit(OP_LOADCONST, dest, const_idx, 0);
+                self.emit(Op::LoadConst, dest, const_idx, 0);
                 Ok(dest)
             },
 
