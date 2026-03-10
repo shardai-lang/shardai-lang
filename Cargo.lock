@@ -5,11 +5,15 @@ version = 4
 [[package]]
 name = "shardai-bytecode"
 version = "0.1.0"
+dependencies = [
+ "shardai-syntax",
+]
 
 [[package]]
 name = "shardai-cli"
 version = "0.1.0"
 dependencies = [
+ "shardai-compiler",
  "shardai-syntax",
 ]
 
@@ -17,6 +21,7 @@ dependencies = [
 name = "shardai-compiler"
 version = "0.1.0"
 dependencies = [
+ "shardai-bytecode",
  "shardai-syntax",
 ]
 
