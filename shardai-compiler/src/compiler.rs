@@ -129,13 +129,9 @@ impl Compiler {
                 Ok(dest)
             }
 
-            Expr::Identifier(token) => {
-                
-
-                self
-                    .get_local(&token.lexeme)
-                    .ok_or(CompileError::UnknownLocal(token.lexeme))
-            }
+            Expr::Identifier(token) => self
+                .get_local(&token.lexeme)
+                .ok_or(CompileError::UnknownLocal(token.lexeme)),
         }
     }
 }
