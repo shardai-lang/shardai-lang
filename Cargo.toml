@@ -1,3 +1,3 @@
 [workspace]
-members = ["shardai-cli", "shardai-compiler", "shardai-syntax"]
+members = ["shardai-bytecode","shardai-cli", "shardai-compiler", "shardai-syntax"]
 resolver = "3"
