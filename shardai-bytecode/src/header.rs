@@ -9,6 +9,7 @@ pub struct BytecodeHeader {
     pub version_major: u8,
     pub version_minor: u8,
     pub constant_count: u16,
+    pub instruction_count: u32
 }
 
 impl Debug for BytecodeHeader {
@@ -22,6 +23,7 @@ impl Debug for BytecodeHeader {
             self.version_major, self.version_minor
         )?;
         write!(f, " Constant Count: {}", self.constant_count)?;
+        write!(f, " Instruction Count: {}", self.instruction_count)?;
 
         Ok(())
     }
@@ -32,6 +34,7 @@ impl BytecodeHeader {
         writer.write_all(&self.signature)?; // Signature
         writer.write_all(&[self.version_major, self.version_minor])?; // Version
         writer.write_all(&self.constant_count.to_le_bytes())?; // Constant count
+        writer.write_all(&self.instruction_count.to_le_bytes())?; // Instruction count
 
         Ok(())
     }
