@@ -24,6 +24,7 @@ impl Constant {
             Constant::String(s) => {
                 writer.write_all(&[STRING_TAG])?; // 1 byte tag
                 writer.write_all(&(s.len() as u32).to_le_bytes())?; // 4 byte length
+                writer.write_all(s.as_bytes())?
             }
             Constant::Number(n) => {
                 writer.write_all(&[NUMBER_TAG])?; // 1 byte tag
