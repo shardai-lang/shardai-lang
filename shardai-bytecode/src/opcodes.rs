@@ -27,12 +27,12 @@ Update instruction.rs if you add a new instruction
 #[repr(u8)]
 #[derive(Clone, Copy)]
 pub enum Op {
-    // Loads constant at B into register at A
-    // reg(a) const(b) -> reg(a) = const(b)
+    /// Loads constant at B into register at A<br>
+    /// reg(a) const(b) -> reg(a) = const(b)
     LoadConst = 0,
 
-    // Moves register A's value to register B
-    // // reg(a) reg(b) -> reg(a) = reg(b)
+    /// Moves register A's value to register B<br>
+    /// reg(a) reg(b) -> reg(a) = reg(b)
     Move = 1,
 }
 
