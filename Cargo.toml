@@ -1,3 +1,10 @@
 [workspace]
 members = ["shardai-bytecode","shardai-cli", "shardai-compiler", "shardai-syntax"]
 resolver = "3"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = "symbols"
+panic = "abort"
