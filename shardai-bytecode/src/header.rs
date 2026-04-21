@@ -2,14 +2,14 @@
 
 use std::fmt::{Debug, Formatter};
 use std::io;
-use std::io::Write;
+use std::io::{Read, Write};
 
 pub struct BytecodeHeader {
     pub signature: [u8; 3], // "SBC" (Shardai bytecode)
     pub version_major: u8,
     pub version_minor: u8,
     pub constant_count: u16,
-    pub instruction_count: u32
+    pub instruction_count: u32,
 }
 
 impl Debug for BytecodeHeader {
@@ -37,5 +37,27 @@ impl BytecodeHeader {
         writer.write_all(&self.instruction_count.to_le_bytes())?; // Instruction count
 
         Ok(())
+    }
+
+    pub fn read(reader: &mut impl Read) -> io::Result<Self> {
+        let mut signature = [0u8; 3];
+        let mut version_major = [0u8; 1];
+        let mut version_minor = [0u8; 1];
+        let mut constant_count_bytes = [0u8; 2]; // one u16
+        let mut instruction_count_bytes = [0u8; 4]; // one u16
+
+        reader.read_exact(&mut signature)?;
+        reader.read_exact(&mut version_major)?;
+        reader.read_exact(&mut version_minor)?;
+        reader.read_exact(&mut constant_count_bytes)?;
+        reader.read_exact(&mut instruction_count_bytes)?;
+
+        Ok(Self {
+            signature,
+            version_major: u8::from_le_bytes(version_major),
+            version_minor: u8::from_le_bytes(version_minor),
+            constant_count: u16::from_le_bytes(constant_count_bytes),
+            instruction_count: u32::from_le_bytes(instruction_count_bytes),
+        })
     }
 }

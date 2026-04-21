@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 shardai-syntax = { path = "../shardai-syntax" }
 shardai-compiler = { path = "../shardai-compiler" }
+shardai-bytecode = { path = "../shardai-bytecode" }

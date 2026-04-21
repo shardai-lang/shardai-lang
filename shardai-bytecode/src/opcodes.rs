@@ -23,10 +23,23 @@ The VM sets the register at register A to the constant at B in the constant pool
 
 Update instruction.rs if you add a new instruction
 */
+use crate::opcodes::Op::{LoadConst, Move};
 
 #[repr(u8)]
 #[derive(Clone, Copy)]
 pub enum Op {
     LoadConst = 0, // reg(a) const(b) -> reg(a) = const(b)
     Move = 1,      // reg(a) reg(b) -> reg(a) = reg(b)
+}
+
+impl TryFrom<u8> for Op {
+    type Error = &'static str;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(LoadConst),
+            1 => Ok(Move),
+            _ => Err("Unknown opcode"),
+        }
+    }
 }
