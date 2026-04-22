@@ -19,7 +19,7 @@ impl VM {
     pub fn new(bytecode_file: BytecodeFile) -> Self {
         let instructions = bytecode_file.instructions;
         let constants = bytecode_file.constants;
-        let registers = vec![Value::Nil; 256];
+        let registers = vec![Value::Void; 256];
         let heap = Vec::new();
 
         Self {
@@ -31,13 +31,16 @@ impl VM {
         }
     }
 
-    pub fn run(&mut self) -> Result<Option<Value>, &'static str> {
+    pub fn run(&mut self) -> Result<Value, &'static str> {
         while let Some(i) = self.instructions.get(self.pc) {
             let inst = *i;
 
             match inst.opcode {
                 Op::LoadConst => self.load_const(inst.a, inst.b)?,
                 Op::Move => self.r#move(inst.a, inst.b)?,
+                
+                Op::Return => return Ok(self.registers[inst.a as usize]),
+                Op::ReturnVoid => return Ok(Value::Void)
             }
 
             self.pc += 1;
@@ -48,8 +51,8 @@ impl VM {
                 println!("REG {}: {:?}", reg, val)
             }
         }
-
-        Ok(None)
+        
+        Ok(Value::Void)
     }
 
     // Opcode handlers

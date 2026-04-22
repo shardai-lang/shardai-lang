@@ -34,6 +34,13 @@ pub enum Op {
     /// Moves register A's value to register B<br>
     /// reg(a) reg(b) -> reg(a) = reg(b)
     Move = 1,
+
+    /// Returns value in register A
+    Return = 2,
+
+    /// Returns void. This is fundamentally different from returning nil
+    /// as it means **nothing** was returned instead of nil being returned.
+    ReturnVoid = 3,
 }
 
 impl TryFrom<u8> for Op {
@@ -43,6 +50,8 @@ impl TryFrom<u8> for Op {
         match value {
             0 => Ok(Op::LoadConst),
             1 => Ok(Op::Move),
+            2 => Ok(Op::Return),
+            3 => Ok(Op::ReturnVoid),
             _ => Err("Unknown opcode"),
         }
     }

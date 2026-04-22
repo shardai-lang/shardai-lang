@@ -116,7 +116,16 @@ impl Compiler {
 
                 Ok(())
             },
-            Stmt::Return { return_value } => unimplemented!()
+            Stmt::Return { return_value } => {
+                if let Some(v) = return_value {
+                    let return_value_register = self.compile_expr(v)?;
+                    self.emit(Op::Return, return_value_register, 0, 0);
+                    Ok(())
+                } else {
+                    self.emit(Op::ReturnVoid, 0, 0, 0);
+                    Ok(())
+                }
+            }
         }
     }
 
