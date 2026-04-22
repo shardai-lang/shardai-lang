@@ -6,5 +6,5 @@ resolver = "3"
 opt-level = "z"
 lto = true
 codegen-units = 1
-strip = "symbols"
+strip = true
 panic = "abort"
