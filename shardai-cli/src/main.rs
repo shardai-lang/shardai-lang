@@ -5,6 +5,7 @@ use shardai_compiler::compiler::Compiler;
 use shardai_syntax::lexer::Lexer;
 use shardai_syntax::parser::Parser;
 use std::fs::File;
+use shardai_vm::vm::VM;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = std::env::args().collect();
@@ -51,7 +52,15 @@ fn run_file(file_path: &String) -> Result<(), Box<dyn std::error::Error>> {
 
     let mut read_file = File::open("output.sbc")?;
     let read_bytecode = BytecodeFile::read(&mut read_file)?;
-    print!("BytecodeFile read:\n{:#?}", read_bytecode);
+    println!("BytecodeFile read:\n{:#?}", read_bytecode);
+
+    let mut vm = VM::new(read_bytecode);
+    let result = vm.run()?;
+    if let Some(v) = result {
+        println!("VM returned: {:#?}", v)
+    } else {
+        println!("VM returned nothing")
+    }
 
     Ok(())
 }

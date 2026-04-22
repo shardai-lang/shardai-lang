@@ -1,0 +1,86 @@
+// Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
+
+use shardai_bytecode::constant::Constant;
+use shardai_bytecode::file::BytecodeFile;
+use shardai_bytecode::instruction::Instruction;
+use shardai_bytecode::opcodes::Op;
+use crate::heap_obj::HeapObj;
+use crate::value::Value;
+
+pub struct VM {
+    instructions: Vec<Instruction>,
+    registers: Vec<Value>,
+    constants: Vec<Constant>,
+    heap: Vec<HeapObj>,
+    pc: usize
+}
+
+impl VM {
+    pub fn new(bytecode_file: BytecodeFile) -> Self {
+        let instructions = bytecode_file.instructions;
+        let constants = bytecode_file.constants;
+        let registers = vec![Value::Nil; 256];
+        let heap = Vec::new();
+
+        Self {
+            instructions,
+            registers,
+            constants,
+            heap,
+            pc: 0,
+        }
+    }
+
+    pub fn run(&mut self) -> Result<Option<Value>, &'static str> {
+        loop {
+            let inst = match self.instructions.get(self.pc) {
+                Some(i) => i.clone(),
+                None => break
+            };
+
+            match inst.opcode {
+                Op::LoadConst => self.load_const(inst.a, inst.b)?,
+                Op::Move => self.r#move(inst.a, inst.b)?
+            }
+
+            self.pc += 1;
+        }
+
+        for (reg, val) in self.registers.iter().enumerate() {
+            if *val != Value::Nil {
+                println!("REG {}: {:?}", reg, val)
+            }
+        }
+
+        Ok(None)
+    }
+
+    // Opcode handlers
+
+    #[inline]
+    fn load_const(&mut self, a: u8, b: u8) -> Result<(), &'static str> {
+        let constant = self.constants.get(b as usize)
+            .ok_or("Illegal operation: invalid constant index")?
+            .clone();
+
+        let register_value = if let Constant::String(s) = constant {
+            self.heap.push(HeapObj::String(s));
+
+            Value::HeapObj(self.heap.len() - 1)
+        } else {
+            Value::from(constant)
+        };
+
+        self.registers[a as usize] = register_value;
+
+        Ok(())
+    }
+
+    #[inline]
+    fn r#move(&mut self, a: u8, b: u8) -> Result<(), &'static str> {
+        let right = self.registers[b as usize].clone();
+        self.registers[a as usize] = right;
+
+        Ok(())
+    }
+}

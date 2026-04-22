@@ -5,7 +5,7 @@ use std::fmt::{Debug, Formatter};
 use std::io;
 use std::io::{ErrorKind, Read, Write};
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Instruction {
     pub opcode: Op,
 
