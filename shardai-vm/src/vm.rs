@@ -1,18 +1,18 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
+use crate::heap_obj::HeapObj;
+use crate::value::Value;
 use shardai_bytecode::constant::Constant;
 use shardai_bytecode::file::BytecodeFile;
 use shardai_bytecode::instruction::Instruction;
 use shardai_bytecode::opcodes::Op;
-use crate::heap_obj::HeapObj;
-use crate::value::Value;
 
 pub struct VM {
     instructions: Vec<Instruction>,
     registers: Vec<Value>,
     constants: Vec<Constant>,
     heap: Vec<HeapObj>,
-    pc: usize
+    pc: usize,
 }
 
 impl VM {
@@ -32,15 +32,12 @@ impl VM {
     }
 
     pub fn run(&mut self) -> Result<Option<Value>, &'static str> {
-        loop {
-            let inst = match self.instructions.get(self.pc) {
-                Some(i) => i.clone(),
-                None => break
-            };
+        while let Some(i) = self.instructions.get(self.pc) {
+            let inst = *i;
 
             match inst.opcode {
                 Op::LoadConst => self.load_const(inst.a, inst.b)?,
-                Op::Move => self.r#move(inst.a, inst.b)?
+                Op::Move => self.r#move(inst.a, inst.b)?,
             }
 
             self.pc += 1;
@@ -59,7 +56,9 @@ impl VM {
 
     #[inline]
     fn load_const(&mut self, a: u8, b: u8) -> Result<(), &'static str> {
-        let constant = self.constants.get(b as usize)
+        let constant = self
+            .constants
+            .get(b as usize)
             .ok_or("Illegal operation: invalid constant index")?
             .clone();
 
@@ -78,7 +77,7 @@ impl VM {
 
     #[inline]
     fn r#move(&mut self, a: u8, b: u8) -> Result<(), &'static str> {
-        let right = self.registers[b as usize].clone();
+        let right = self.registers[b as usize];
         self.registers[a as usize] = right;
 
         Ok(())

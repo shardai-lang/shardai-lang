@@ -4,8 +4,8 @@ use shardai_bytecode::file::BytecodeFile;
 use shardai_compiler::compiler::Compiler;
 use shardai_syntax::lexer::Lexer;
 use shardai_syntax::parser::Parser;
-use std::fs::File;
 use shardai_vm::vm::VM;
+use std::fs::File;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = std::env::args().collect();

@@ -2,13 +2,12 @@
 
 use shardai_bytecode::constant::Constant;
 
-#[derive(Debug, Clone, Copy)]
-#[derive(PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Value {
     HeapObj(usize),
     Bool(bool),
     Number(f64),
-    Nil
+    Nil,
 }
 
 impl From<Constant> for Value {
@@ -17,7 +16,7 @@ impl From<Constant> for Value {
             Constant::Number(n) => Value::Number(n),
             Constant::Bool(b) => Value::Bool(b),
             Constant::Nil => Value::Nil,
-            Constant::String(_) => panic!("String is incompatible with Value, put it in the heap")
+            Constant::String(_) => panic!("String is incompatible with Value, put it in the heap"),
         }
     }
 }

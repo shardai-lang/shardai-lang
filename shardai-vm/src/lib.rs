@@ -1,3 +1,3 @@
-pub mod vm;
-mod value;
 mod heap_obj;
+mod value;
+pub mod vm;
