@@ -3,9 +3,9 @@
 use crate::opcodes::Op;
 use std::fmt::{Debug, Formatter};
 use std::io;
-use std::io::Write;
+use std::io::{ErrorKind, Read, Write};
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Instruction {
     pub opcode: Op,
 
@@ -20,6 +20,23 @@ impl Instruction {
         writer.write_all(&[self.a, self.b, self.c])?;
 
         Ok(())
+    }
+
+    pub fn read(reader: &mut impl Read) -> io::Result<Self> {
+        let mut opcode_bytes = [0u8; 1];
+        let mut aux_bytes = [0u8; 3];
+
+        reader.read_exact(&mut opcode_bytes)?;
+        reader.read_exact(&mut aux_bytes)?;
+
+        let opcode = Op::try_from(u8::from_le_bytes(opcode_bytes))
+            .map_err(|e| io::Error::new(ErrorKind::InvalidData, e))?;
+
+        let a = aux_bytes[0];
+        let b = aux_bytes[1];
+        let c = aux_bytes[2];
+
+        Ok(Self { opcode, a, b, c })
     }
 }
 

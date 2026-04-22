@@ -3,7 +3,7 @@
     <img src="assets/logo-light.png#gh-dark-mode-only" alt="Shardai" width="450">
     <br/><br/>
     <a href="LICENSE"><img src="https://img.shields.io/github/license/shardai-lang/shardai-lang"/></a>
-    <a><img src="https://img.shields.io/badge/status-pre--alpha-orange.svg"/></a>
+    <a><img src="https://img.shields.io/badge/status-pre--alpha-orange"/></a>
 </div>
 
 Shardai is a managed programming language focused on speed, simplicity, and first-class developer experience.

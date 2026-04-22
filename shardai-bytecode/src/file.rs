@@ -4,7 +4,7 @@ use crate::constant::Constant;
 use crate::header::BytecodeHeader;
 use crate::instruction::Instruction;
 use std::io;
-use std::io::Write;
+use std::io::{Read, Write};
 
 #[derive(Debug)]
 pub struct BytecodeFile {
@@ -26,5 +26,25 @@ impl BytecodeFile {
         }
 
         Ok(())
+    }
+
+    pub fn read(reader: &mut impl Read) -> io::Result<Self> {
+        let header = BytecodeHeader::read(reader)?;
+        let mut constants = Vec::new();
+        let mut instructions = Vec::new();
+
+        for _ in 0..header.constant_count {
+            constants.push(Constant::read(reader)?)
+        }
+
+        for _ in 0..header.instruction_count {
+            instructions.push(Instruction::read(reader)?)
+        }
+
+        Ok(Self {
+            header,
+            constants,
+            instructions,
+        })
     }
 }

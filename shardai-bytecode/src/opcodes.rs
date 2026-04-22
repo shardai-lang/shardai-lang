@@ -27,6 +27,23 @@ Update instruction.rs if you add a new instruction
 #[repr(u8)]
 #[derive(Clone, Copy)]
 pub enum Op {
-    LoadConst = 0, // reg(a) const(b) -> reg(a) = const(b)
-    Move = 1,      // reg(a) reg(b) -> reg(a) = reg(b)
+    /// Loads constant at B into register at A<br>
+    /// reg(a) const(b) -> reg(a) = const(b)
+    LoadConst = 0,
+
+    /// Moves register A's value to register B<br>
+    /// reg(a) reg(b) -> reg(a) = reg(b)
+    Move = 1,
+}
+
+impl TryFrom<u8> for Op {
+    type Error = &'static str;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Op::LoadConst),
+            1 => Ok(Op::Move),
+            _ => Err("Unknown opcode"),
+        }
+    }
 }

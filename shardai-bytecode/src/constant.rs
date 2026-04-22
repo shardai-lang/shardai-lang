@@ -3,7 +3,7 @@
 use shardai_syntax::literal_value::LiteralValue;
 use std::fmt::{Debug, Formatter};
 use std::io;
-use std::io::Write;
+use std::io::{ErrorKind, Read, Write};
 
 #[derive(Clone)]
 pub enum Constant {
@@ -24,13 +24,14 @@ impl Constant {
             Constant::String(s) => {
                 writer.write_all(&[STRING_TAG])?; // 1 byte tag
                 writer.write_all(&(s.len() as u32).to_le_bytes())?; // 4 byte length
+                writer.write_all(s.as_bytes())?
             }
             Constant::Number(n) => {
                 writer.write_all(&[NUMBER_TAG])?; // 1 byte tag
                 writer.write_all(&n.to_le_bytes())?; // 8 byte length (all numbers are f64)
             }
             Constant::Bool(n) => {
-                writer.write_all(&[NUMBER_TAG])?; // 1 byte tag
+                writer.write_all(&[BOOL_TAG])?; // 1 byte tag
                 writer.write_all(&[*n as u8])?; // 1 byte length (inefficient but whatever)
             }
             Constant::Nil => {
@@ -39,6 +40,55 @@ impl Constant {
         }
 
         Ok(())
+    }
+
+    pub fn read(reader: &mut impl Read) -> io::Result<Self> {
+        let mut tag_bytes = [0u8; 1];
+        reader.read_exact(&mut tag_bytes)?;
+        let tag = u8::from_le_bytes(tag_bytes);
+
+        match tag {
+            STRING_TAG => {
+                let mut length_bytes = [0u8; 4];
+                reader.read_exact(&mut length_bytes)?;
+                let length = u32::from_le_bytes(length_bytes);
+
+                let mut string_bytes = vec![0u8; length as usize];
+                reader.read_exact(&mut string_bytes)?;
+
+                let string = String::from_utf8(string_bytes)
+                    .map_err(|e| io::Error::new(ErrorKind::InvalidData, e.to_string()))?;
+
+                Ok(Self::String(string))
+            }
+            NUMBER_TAG => {
+                let mut number_bytes = [0u8; 8];
+                reader.read_exact(&mut number_bytes)?;
+
+                let number = f64::from_le_bytes(number_bytes);
+                Ok(Self::Number(number))
+            }
+            BOOL_TAG => {
+                let mut bool_bytes = [0u8; 1];
+                reader.read_exact(&mut bool_bytes)?;
+
+                match bool_bytes[0] {
+                    0 => Ok(Constant::Bool(false)),
+                    1 => Ok(Constant::Bool(true)),
+
+                    _ => Err(io::Error::new(
+                        ErrorKind::InvalidData,
+                        "Invalid boolean value",
+                    )),
+                }
+            }
+
+            NIL_TAG => Ok(Constant::Nil),
+            _ => Err(io::Error::new(
+                ErrorKind::InvalidData,
+                "Unknown constant tag",
+            )),
+        }
     }
 }
 
