@@ -60,6 +60,8 @@ impl Parser {
     fn statement(&mut self) -> Result<Stmt, ParseError> {
         if match_token!(self, TokenType::Var) {
             return self.var_declaration();
+        } else if match_token!(self, TokenType::Return) {
+            return self.return_statement()
         }
 
         self.expression_statement()
@@ -96,6 +98,17 @@ impl Parser {
 
         self.consume(TokenType::Semicolon, ErrorMessage::ExpectedChar(';'))?;
         Ok(Stmt::Var { name, initializer })
+    }
+
+    fn return_statement(&mut self) -> Result<Stmt, ParseError> {
+        let return_value = if !self.check(TokenType::Semicolon)? {
+            Some(self.expression()?)
+        } else {
+            None
+        };
+
+        self.consume(TokenType::Semicolon, ErrorMessage::ExpectedChar(';'))?;
+        Ok(Stmt::Return { return_value })
     }
 
     // Expression parsers

@@ -14,4 +14,7 @@ pub enum Stmt {
         target: Expr,
         value: Expr,
     },
+    Return {
+        return_value: Option<Expr>
+    }
 }

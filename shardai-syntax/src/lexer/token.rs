@@ -35,4 +35,5 @@ pub enum TokenType {
     True,
     False,
     Nil,
+    Return
 }

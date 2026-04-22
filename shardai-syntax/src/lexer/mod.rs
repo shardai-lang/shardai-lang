@@ -24,6 +24,7 @@ impl Lexer {
             ("true".into(), TokenType::True),
             ("false".into(), TokenType::False),
             ("nil".into(), TokenType::Nil),
+            ("return".into(), TokenType::Return)
         ]);
 
         Self {

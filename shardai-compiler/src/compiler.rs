@@ -115,7 +115,8 @@ impl Compiler {
                 self.compile_expr(e)?;
 
                 Ok(())
-            }
+            },
+            Stmt::Return { return_value } => unimplemented!()
         }
     }
 
