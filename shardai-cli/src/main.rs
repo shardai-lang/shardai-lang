@@ -39,7 +39,7 @@ fn run_file(file_path: &String) -> Result<(), Box<dyn std::error::Error>> {
     let ast = parser.parse()?;
 
     for node in &ast {
-        println!("{:?}", node)
+        println!("{:#?}", node)
     }
 
     let mut compiler = Compiler::new();

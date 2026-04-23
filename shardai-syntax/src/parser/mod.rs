@@ -120,11 +120,11 @@ impl Parser {
     // while right associative functions call themselves.
     // Left associative is `Add(Add(1,2),3)`, while right associative is `Exp(2,Exp(3,4))`
     fn expression(&mut self) -> Result<Expr, ParseError> {
-        self.exponentiation()
+        self.term()
     }
 
     fn exponentiation(&mut self) -> Result<Expr, ParseError> {
-        let left = self.factor()?;
+        let left = self.primary()?;
 
         while match_token!(self, TokenType::Carat)  {
             let right = self.exponentiation()?;
@@ -139,11 +139,11 @@ impl Parser {
     }
 
     fn factor(&mut self) -> Result<Expr, ParseError> {
-        let mut expr = self.term()?;
+        let mut expr = self.exponentiation()?;
 
         while match_token!(self, TokenType::Star, TokenType::Slash) {
             let operation = self.previous().clone();
-            let right = self.term()?;
+            let right = self.exponentiation()?;
 
             expr = match operation.token_type {
                 TokenType::Star => Expr::Multiply {
@@ -164,11 +164,11 @@ impl Parser {
     }
 
     fn term(&mut self) -> Result<Expr, ParseError> {
-        let mut expr = self.primary()?;
+        let mut expr = self.factor()?;
 
         while match_token!(self, TokenType::Plus, TokenType::Minus) {
             let operation = self.previous().clone();
-            let right = self.primary()?;
+            let right = self.factor()?;
 
             expr = match operation.token_type {
                 TokenType::Plus => Expr::Add {

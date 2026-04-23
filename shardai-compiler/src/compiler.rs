@@ -143,6 +143,8 @@ impl Compiler {
             Expr::Identifier(token) => self
                 .get_local(&token.lexeme)
                 .ok_or(CompileError::UnknownLocal(token.lexeme)),
+
+            _ => unimplemented!()
         }
     }
 }
