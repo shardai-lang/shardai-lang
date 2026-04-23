@@ -138,7 +138,7 @@ impl Parser {
 
         while match_token!(self, TokenType::Star, TokenType::Slash) {
             let operation = self.previous().clone();
-            let right = self.primary()?;
+            let right = self.term()?;
 
             expr = match operation.token_type {
                 TokenType::Star => Expr::Multiply {
