@@ -7,4 +7,12 @@ use crate::literal_value::LiteralValue;
 pub enum Expr {
     Literal(LiteralValue),
     Identifier(Token),
+    Add {
+        left: Box<Expr>,
+        right: Box<Expr>
+    },
+    Subtract {
+        left: Box<Expr>,
+        right: Box<Expr>
+    }
 }

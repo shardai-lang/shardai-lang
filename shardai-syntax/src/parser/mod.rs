@@ -115,10 +115,37 @@ impl Parser {
 
     // Highest level parser
     fn expression(&mut self) -> Result<Expr, ParseError> {
-        self.primary()
+        self.term()
     }
 
-    // Lowest level parser
+    fn term(&mut self) -> Result<Expr, ParseError> {
+        let mut expr = self.primary()?;
+
+        while match_token!(self, TokenType::Plus, TokenType::Minus) {
+            let operation = self.previous().clone();
+            let right = self.primary()?;
+
+            expr = match operation.token_type {
+                TokenType::Plus => {
+                    Expr::Add {
+                        left: expr.into(),
+                        right: right.into()
+                    }
+                }
+                TokenType::Minus => {
+                    Expr::Subtract {
+                        left: expr.into(),
+                        right: right.into()
+                    }
+                }
+
+                _ => unreachable!()
+            }
+        }
+
+        Ok(expr)
+    }
+
     fn primary(&mut self) -> Result<Expr, ParseError> {
         if match_token!(self, TokenType::Number) {
             return Ok(Expr::Literal(self.previous().literal.clone().unwrap()));
