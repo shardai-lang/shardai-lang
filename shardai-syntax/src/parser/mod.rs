@@ -126,18 +126,15 @@ impl Parser {
             let right = self.primary()?;
 
             expr = match operation.token_type {
-                TokenType::Plus => {
-                    Expr::Add {
-                        left: expr.into(),
-                        right: right.into()
-                    }
-                }
-                TokenType::Minus => {
-                    Expr::Subtract {
-                        left: expr.into(),
-                        right: right.into()
-                    }
-                }
+                TokenType::Plus => Expr::Add {
+                    left: expr.into(),
+                    right: right.into()
+                },
+
+                TokenType::Minus => Expr::Subtract {
+                    left: expr.into(),
+                    right: right.into()
+                },
 
                 _ => unreachable!()
             }
