@@ -115,7 +115,32 @@ impl Parser {
 
     // Highest level parser
     fn expression(&mut self) -> Result<Expr, ParseError> {
-        self.term()
+        self.factor()
+    }
+
+    fn factor(&mut self) -> Result<Expr, ParseError> {
+        let mut expr = self.term()?;
+
+        while match_token!(self, TokenType::Star, TokenType::Slash) {
+            let operation = self.previous().clone();
+            let right = self.primary()?;
+
+            expr = match operation.token_type {
+                TokenType::Star => Expr::Multiply {
+                    left: expr.into(),
+                    right: right.into()
+                },
+
+                TokenType::Slash => Expr::Divide {
+                    left: expr.into(),
+                    right: right.into()
+                },
+
+                _ => unimplemented!()
+            }
+        }
+
+        Ok(expr)
     }
 
     fn term(&mut self) -> Result<Expr, ParseError> {

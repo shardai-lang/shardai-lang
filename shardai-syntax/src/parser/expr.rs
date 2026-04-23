@@ -14,5 +14,13 @@ pub enum Expr {
     Subtract {
         left: Box<Expr>,
         right: Box<Expr>
+    },
+    Multiply {
+        left: Box<Expr>,
+        right: Box<Expr>
+    },
+    Divide {
+        left: Box<Expr>,
+        right: Box<Expr>
     }
 }
