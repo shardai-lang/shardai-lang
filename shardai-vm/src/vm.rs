@@ -6,6 +6,7 @@ use shardai_bytecode::constant::Constant;
 use shardai_bytecode::file::BytecodeFile;
 use shardai_bytecode::instruction::Instruction;
 use shardai_bytecode::opcodes::Op;
+use crate::runtime_error::RuntimeError;
 
 pub struct VM {
     instructions: Vec<Instruction>,
@@ -31,7 +32,7 @@ impl VM {
         }
     }
 
-    pub fn run(&mut self) -> Result<Value, &'static str> {
+    pub fn run(&mut self) -> Result<Value, RuntimeError> {
         while let Some(i) = self.instructions.get(self.pc) {
             let inst = *i;
 
@@ -54,11 +55,11 @@ impl VM {
     // Opcode handlers
 
     #[inline]
-    fn load_const(&mut self, a: u8, b: u8) -> Result<(), &'static str> {
+    fn load_const(&mut self, a: u8, b: u8) -> Result<(), RuntimeError> {
         let constant = self
             .constants
             .get(b as usize)
-            .ok_or("Illegal operation: invalid constant index")?
+            .ok_or(RuntimeError::IllegalOperation("invalid constant index"))?
             .clone();
 
         let register_value = if let Constant::String(s) = constant {
@@ -75,7 +76,7 @@ impl VM {
     }
 
     #[inline]
-    fn r#move(&mut self, a: u8, b: u8) -> Result<(), &'static str> {
+    fn r#move(&mut self, a: u8, b: u8) -> Result<(), RuntimeError> {
         let right = self.registers[b as usize];
         self.registers[a as usize] = right;
 
