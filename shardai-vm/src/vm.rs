@@ -47,12 +47,6 @@ impl VM {
 
             self.pc += 1;
         }
-
-        for (reg, val) in self.registers.iter().enumerate() {
-            if *val != Value::Nil {
-                println!("REG {}: {:?}", reg, val)
-            }
-        }
         
         Ok(Value::Void)
     }
