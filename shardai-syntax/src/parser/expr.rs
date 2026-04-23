@@ -22,5 +22,9 @@ pub enum Expr {
     Divide {
         left: Box<Expr>,
         right: Box<Expr>
-    }
+    },
+    Exponentiation {
+        left: Box<Expr>,
+        right: Box<Expr>
+    },
 }

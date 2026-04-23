@@ -115,7 +115,22 @@ impl Parser {
 
     // Highest level parser
     fn expression(&mut self) -> Result<Expr, ParseError> {
-        self.factor()
+        self.exponentiation()
+    }
+
+    fn exponentiation(&mut self) -> Result<Expr, ParseError> {
+        let left = self.factor()?;
+
+        while match_token!(self, TokenType::Carat)  {
+            let right = self.exponentiation()?;
+
+            return Ok(Expr::Exponentiation {
+                left: left.into(),
+                right: right.into()
+            })
+        }
+
+        Ok(left)
     }
 
     fn factor(&mut self) -> Result<Expr, ParseError> {
