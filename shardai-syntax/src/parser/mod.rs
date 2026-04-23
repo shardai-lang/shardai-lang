@@ -114,6 +114,11 @@ impl Parser {
     // Expression parsers
 
     // Highest level parser
+    // Math: The parser chain is essentially just reverse PEMDAS. (SADMEP)
+    // First S/A (term), then D/M (factor), then E (exponentiation), then P (primary).
+    // Left associative functions call the next highest precedence in a loop (ex. S/A calls D/M),
+    // while right associative functions call themselves.
+    // Left associative is `Add(Add(1,2),3)`, while right associative is `Exp(2,Exp(3,4))`
     fn expression(&mut self) -> Result<Expr, ParseError> {
         self.exponentiation()
     }
