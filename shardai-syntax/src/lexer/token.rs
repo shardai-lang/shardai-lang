@@ -35,5 +35,10 @@ pub enum TokenType {
     True,
     False,
     Nil,
-    Return
+    Return,
+    Plus,
+    Minus,
+    Star,
+    Slash,
+    Carat
 }
