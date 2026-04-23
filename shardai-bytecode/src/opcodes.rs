@@ -41,6 +41,26 @@ pub enum Op {
     /// Returns void. This is fundamentally different from returning nil
     /// as it means **nothing** was returned instead of nil being returned.
     ReturnVoid = 3,
+
+    /// Sets register A to the sum of register B + register C
+    /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) + reg(c)
+    Add = 4,
+
+    /// Sets register A to the difference between register B - register C
+    /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) - reg(c)
+    Subtract = 5,
+
+    /// Sets register A to the product between register B * register C
+    /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) * reg(c)
+    Multiply = 6,
+
+    /// Sets register A to the quotient between register B / register C
+    /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) / reg(c)
+    Divide = 7,
+
+    /// Sets register A to the power of register B ^ register C
+    /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) ^ reg(c)
+    Exponentiate = 8
 }
 
 impl TryFrom<u8> for Op {

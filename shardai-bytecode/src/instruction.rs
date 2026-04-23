@@ -46,7 +46,12 @@ impl Debug for Instruction {
             Op::LoadConst => "LOADCONST",
             Op::Move => "MOVE",
             Op::Return => "RETURN",
-            Op::ReturnVoid => "RETURNVOID"
+            Op::ReturnVoid => "RETURNVOID",
+            Op::Add => "ADD",
+            Op::Subtract => "SUBTRACT",
+            Op::Multiply => "MULTIPLY",
+            Op::Divide => "DIVIDE",
+            Op::Exponentiate => "EXPONENTIATE"
         };
 
         write!(f, "{} {} {} {}", op_name, self.a, self.b, self.c)

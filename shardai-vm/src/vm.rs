@@ -40,7 +40,9 @@ impl VM {
                 Op::Move => self.r#move(inst.a, inst.b)?,
                 
                 Op::Return => return Ok(self.registers[inst.a as usize]),
-                Op::ReturnVoid => return Ok(Value::Void)
+                Op::ReturnVoid => return Ok(Value::Void),
+
+                _ => unimplemented!()
             }
 
             self.pc += 1;
