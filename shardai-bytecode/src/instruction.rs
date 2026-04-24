@@ -53,7 +53,8 @@ impl Debug for Instruction {
             Op::Divide => "DIVIDE",
             Op::Exponentiate => "EXPONENTIATE",
             Op::Jump => "JUMP",
-            Op::JumpIfTruthy => "JUMPIFTRUTHY"
+            Op::JumpIfTruthy => "JUMPIFTRUTHY",
+            Op::JumpIfFalsy => "JUMPIFFALSY"
         };
 
         write!(f, "{} {} {} {}", op_name, self.a, self.b, self.c)
