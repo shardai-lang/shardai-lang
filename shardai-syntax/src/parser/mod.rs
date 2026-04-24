@@ -126,17 +126,25 @@ impl Parser {
         self.advance()?; // skip closing brace
 
         if self.check(TokenType::Else)? {
-            let mut branch = Vec::new();
-
             self.advance()?; // skip `else`
-            self.advance()?; // skip opening brace
-            while !self.check(TokenType::RightBrace)? {
-                branch.push(self.statement()?);
+
+            if self.check(TokenType::If)? {
+                self.advance()?; // skip `if`
+                let nested = self.if_statement()?;
+
+                else_branch = Some(vec![nested])
+            } else {
+                let mut branch = Vec::new();
+
+                self.advance()?; // skip opening brace
+                while !self.check(TokenType::RightBrace)? {
+                    branch.push(self.statement()?);
+                }
+
+                self.advance()?; // skip closing brace
+
+                else_branch = Some(branch)
             }
-
-            self.advance()?; // skip closing brace
-
-            else_branch = Some(branch)
         }
 
         Ok(Stmt::If {

@@ -1,9 +1,11 @@
 var finalString = "";
 
 if true {
-    finalString = finalString + "condition true, first branch";
+    finalString = finalString + "condition true, if branch";
+} else if false {
+    finalString = finalString + "this should never be possible, else if branch";
 } else {
-    finalString = finalString + "condition false, second branch";
+    finalString = finalString + "condition false, else branch";
 }
 
 return finalString;
