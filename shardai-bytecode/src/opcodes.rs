@@ -69,7 +69,7 @@ pub enum Op {
     /// Adds A and B read as an i16 to the program counter if the value in register C is truthy
     /// number(AB) reg(c) -> ip += number(AB) if reg(c)
     JumpIfTruthy = 10,
-    
+
     /// Adds A and B read as an i16 to the program counter if the value in register C is falsy
     /// number(AB) reg(c) -> ip += number(AB) if not reg(c)
     JumpIfFalsy = 11,

@@ -20,6 +20,6 @@ pub enum Stmt {
     If {
         condition: Expr,
         if_branch: Vec<Stmt>,
-        else_branch: Option<Vec<Stmt>>
-    }
+        else_branch: Option<Vec<Stmt>>,
+    },
 }

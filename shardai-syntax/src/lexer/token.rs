@@ -45,5 +45,5 @@ pub enum TokenType {
     If,
     Else,
     LeftBrace,
-    RightBrace
+    RightBrace,
 }

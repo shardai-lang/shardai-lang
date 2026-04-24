@@ -127,8 +127,12 @@ impl Compiler {
                     self.emit(Op::ReturnVoid, 0, 0, 0);
                     Ok(())
                 }
-            },
-            Stmt::If { condition, if_branch, else_branch } => {
+            }
+            Stmt::If {
+                condition,
+                if_branch,
+                else_branch,
+            } => {
                 let condition_register = self.compile_expr(condition)?;
 
                 match else_branch {
@@ -143,7 +147,7 @@ impl Compiler {
                         self.patch_jump(cond_jump_pos);
 
                         Ok(())
-                    },
+                    }
 
                     // `if` and `else`
                     Some(else_branch) => {

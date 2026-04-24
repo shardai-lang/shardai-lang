@@ -139,7 +139,11 @@ impl Parser {
             else_branch = Some(branch)
         }
 
-        Ok(Stmt::If { condition, if_branch, else_branch })
+        Ok(Stmt::If {
+            condition,
+            if_branch,
+            else_branch,
+        })
     }
 
     // Expression parsers
