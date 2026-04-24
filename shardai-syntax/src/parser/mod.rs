@@ -126,7 +126,7 @@ impl Parser {
     fn exponentiation(&mut self) -> Result<Expr, ParseError> {
         let left = self.primary()?;
 
-        while match_token!(self, TokenType::Carat)  {
+        if match_token!(self, TokenType::Carat)  {
             let right = self.exponentiation()?;
 
             return Ok(Expr::Exponentiation {

@@ -47,8 +47,6 @@ impl VM {
                 
                 Op::Return => return Ok(self.registers[inst.a as usize]),
                 Op::ReturnVoid => return Ok(Value::Void),
-
-                _ => unimplemented!()
             }
 
             self.pc += 1;
@@ -94,7 +92,10 @@ impl VM {
         let right = self.registers[c as usize];
 
         match (left, right) {
-            (Value::Number(l), Value::Number(r)) => Ok(self.registers[a as usize] = Value::Number(l + r)),
+            (Value::Number(l), Value::Number(r)) => {
+                let _: () = self.registers[a as usize] = Value::Number(l + r);
+                Ok(())
+            },
             (Value::HeapObj(l_idx), Value::HeapObj(r_idx)) => {
                 let concatenated = {
                     let l = self.heap.get(l_idx)
@@ -110,6 +111,7 @@ impl VM {
                             s
                         }
 
+                        #[allow(unreachable_patterns)]
                         _ => return Err(RuntimeError::InvalidOperation(format!("cannot add {} and {}", l, r))),
                     }
                 };
