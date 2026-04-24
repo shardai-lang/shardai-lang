@@ -221,7 +221,7 @@ impl VM {
     #[inline]
     fn jump(&mut self, a: u8, b: u8) -> Result<(), RuntimeError> {
         let offset = i16::from_le_bytes([a, b]);
-        self.pc
+        self.pc = self.pc
             .checked_add_signed(offset as isize)
             .ok_or(RuntimeError::IllegalOperation("jump out of bounds".into()))?;
 
