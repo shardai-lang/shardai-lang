@@ -128,7 +128,46 @@ impl Compiler {
                     Ok(())
                 }
             },
-            Stmt::If { condition, if_branch, else_branch } => unimplemented!()
+            Stmt::If { condition, if_branch, else_branch } => {
+                let condition_register = self.compile_expr(condition)?;
+
+                match else_branch {
+                    // `if` only
+                    None => {
+                        let cond_jump_pos = self.emit(Op::JumpIfFalsy, 0, 0, condition_register);
+
+                        for stmt in if_branch {
+                            self.compile_stmt(stmt)?;
+                        }
+
+                        self.patch_jump(cond_jump_pos);
+
+                        Ok(())
+                    },
+
+                    // `if` and `else`
+                    Some(else_branch) => {
+                        let cond_jump_pos = self.emit(Op::JumpIfFalsy, 0, 0, condition_register);
+
+                        for stmt in if_branch {
+                            self.compile_stmt(stmt)?;
+                        }
+
+                        // jump past else block, emitted at end of if branch
+                        let end_jump_pos = self.emit(Op::Jump, 0, 0, 0);
+
+                        self.patch_jump(cond_jump_pos);
+
+                        for stmt in else_branch {
+                            self.compile_stmt(stmt)?;
+                        }
+
+                        self.patch_jump(end_jump_pos);
+
+                        Ok(())
+                    }
+                }
+            }
         }
     }
 
