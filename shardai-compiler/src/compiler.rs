@@ -116,6 +116,16 @@ impl Compiler {
 
                 Ok(())
             }
+            Stmt::Return { return_value } => {
+                if let Some(v) = return_value {
+                    let return_value_register = self.compile_expr(v)?;
+                    self.emit(Op::Return, return_value_register, 0, 0);
+                    Ok(())
+                } else {
+                    self.emit(Op::ReturnVoid, 0, 0, 0);
+                    Ok(())
+                }
+            }
         }
     }
 
@@ -133,6 +143,24 @@ impl Compiler {
             Expr::Identifier(token) => self
                 .get_local(&token.lexeme)
                 .ok_or(CompileError::UnknownLocal(token.lexeme)),
+
+            Expr::Add { left, right } => self.compile_binary_op(*left, *right, Op::Add),
+            Expr::Subtract { left, right } => self.compile_binary_op(*left, *right, Op::Subtract),
+            Expr::Multiply { left, right } => self.compile_binary_op(*left, *right, Op::Multiply),
+            Expr::Divide { left, right } => self.compile_binary_op(*left, *right, Op::Divide),
+            Expr::Exponentiation { left, right } => {
+                self.compile_binary_op(*left, *right, Op::Exponentiate)
+            }
         }
+    }
+
+    fn compile_binary_op(&mut self, left: Expr, right: Expr, op: Op) -> Result<u8, CompileError> {
+        let left = self.compile_expr(left)?;
+        let right = self.compile_expr(right)?;
+        let dest = self.next_register;
+        self.next_register += 1;
+
+        self.emit(op, dest, left, right);
+        Ok(dest)
     }
 }

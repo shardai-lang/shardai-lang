@@ -39,7 +39,7 @@ fn run_file(file_path: &String) -> Result<(), Box<dyn std::error::Error>> {
     let ast = parser.parse()?;
 
     for node in &ast {
-        println!("{:?}", node)
+        println!("{:#?}", node)
     }
 
     let mut compiler = Compiler::new();
@@ -56,11 +56,7 @@ fn run_file(file_path: &String) -> Result<(), Box<dyn std::error::Error>> {
 
     let mut vm = VM::new(read_bytecode);
     let result = vm.run()?;
-    if let Some(v) = result {
-        println!("VM returned: {:#?}", v)
-    } else {
-        println!("VM returned nothing")
-    }
+    println!("VM returned: {}", result);
 
     Ok(())
 }

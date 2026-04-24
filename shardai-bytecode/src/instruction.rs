@@ -45,6 +45,13 @@ impl Debug for Instruction {
         let op_name = match self.opcode {
             Op::LoadConst => "LOADCONST",
             Op::Move => "MOVE",
+            Op::Return => "RETURN",
+            Op::ReturnVoid => "RETURNVOID",
+            Op::Add => "ADD",
+            Op::Subtract => "SUBTRACT",
+            Op::Multiply => "MULTIPLY",
+            Op::Divide => "DIVIDE",
+            Op::Exponentiate => "EXPONENTIATE",
         };
 
         write!(f, "{} {} {} {}", op_name, self.a, self.b, self.c)

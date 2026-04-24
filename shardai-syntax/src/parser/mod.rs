@@ -60,6 +60,8 @@ impl Parser {
     fn statement(&mut self) -> Result<Stmt, ParseError> {
         if match_token!(self, TokenType::Var) {
             return self.var_declaration();
+        } else if match_token!(self, TokenType::Return) {
+            return self.return_statement();
         }
 
         self.expression_statement()
@@ -98,14 +100,94 @@ impl Parser {
         Ok(Stmt::Var { name, initializer })
     }
 
+    fn return_statement(&mut self) -> Result<Stmt, ParseError> {
+        let return_value = if !self.check(TokenType::Semicolon)? {
+            Some(self.expression()?)
+        } else {
+            None
+        };
+
+        self.consume(TokenType::Semicolon, ErrorMessage::ExpectedChar(';'))?;
+        Ok(Stmt::Return { return_value })
+    }
+
     // Expression parsers
 
     // Highest level parser
+    // Math: The parser chain is essentially just reverse PEMDAS. (SADMEP)
+    // First S/A (term), then D/M (factor), then E (exponentiation), then P (primary).
+    // Left associative functions call the next highest precedence in a loop (ex. S/A calls D/M),
+    // while right associative functions call themselves.
+    // Left associative is `Add(Add(1,2),3)`, while right associative is `Exp(2,Exp(3,4))`
     fn expression(&mut self) -> Result<Expr, ParseError> {
-        self.primary()
+        self.term()
     }
 
-    // Lowest level parser
+    fn exponentiation(&mut self) -> Result<Expr, ParseError> {
+        let left = self.primary()?;
+
+        if match_token!(self, TokenType::Carat) {
+            let right = self.exponentiation()?;
+
+            return Ok(Expr::Exponentiation {
+                left: left.into(),
+                right: right.into(),
+            });
+        }
+
+        Ok(left)
+    }
+
+    fn factor(&mut self) -> Result<Expr, ParseError> {
+        let mut expr = self.exponentiation()?;
+
+        while match_token!(self, TokenType::Star, TokenType::Slash) {
+            let operation = self.previous().clone();
+            let right = self.exponentiation()?;
+
+            expr = match operation.token_type {
+                TokenType::Star => Expr::Multiply {
+                    left: expr.into(),
+                    right: right.into(),
+                },
+
+                TokenType::Slash => Expr::Divide {
+                    left: expr.into(),
+                    right: right.into(),
+                },
+
+                _ => unimplemented!(),
+            }
+        }
+
+        Ok(expr)
+    }
+
+    fn term(&mut self) -> Result<Expr, ParseError> {
+        let mut expr = self.factor()?;
+
+        while match_token!(self, TokenType::Plus, TokenType::Minus) {
+            let operation = self.previous().clone();
+            let right = self.factor()?;
+
+            expr = match operation.token_type {
+                TokenType::Plus => Expr::Add {
+                    left: expr.into(),
+                    right: right.into(),
+                },
+
+                TokenType::Minus => Expr::Subtract {
+                    left: expr.into(),
+                    right: right.into(),
+                },
+
+                _ => unreachable!(),
+            }
+        }
+
+        Ok(expr)
+    }
+
     fn primary(&mut self) -> Result<Expr, ParseError> {
         if match_token!(self, TokenType::Number) {
             return Ok(Expr::Literal(self.previous().literal.clone().unwrap()));
