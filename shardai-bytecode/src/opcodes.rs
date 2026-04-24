@@ -72,7 +72,13 @@ impl TryFrom<u8> for Op {
             1 => Ok(Op::Move),
             2 => Ok(Op::Return),
             3 => Ok(Op::ReturnVoid),
-            _ => Err("Unknown opcode"),
+            4 => Ok(Op::Add),
+            5 => Ok(Op::Subtract),
+            6 => Ok(Op::Multiply),
+            7 => Ok(Op::Divide),
+            8 => Ok(Op::Exponentiate),
+
+            _ => Err("Unknown opcode")
         }
     }
 }
