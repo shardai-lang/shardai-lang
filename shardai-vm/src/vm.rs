@@ -230,7 +230,6 @@ impl VM {
     #[inline]
     fn jump_if_truthy(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
         let value = self.registers[c as usize];
-
         if self.is_truthy(&value) {
             self.jump(a, b)?
         }
