@@ -95,7 +95,7 @@ impl VM {
 
         match (left, right) {
             (Value::Number(l), Value::Number(r)) => {
-                let _: () = self.registers[a as usize] = Value::Number(l + r);
+                self.registers[a as usize] = Value::Number(l + r);
                 Ok(())
             }
             (Value::HeapObj(l_idx), Value::HeapObj(r_idx)) => {
