@@ -197,6 +197,8 @@ impl Parser {
             return Ok(Expr::Literal(LiteralValue::Bool(false)));
         } else if match_token!(self, TokenType::Nil) {
             return Ok(Expr::Literal(LiteralValue::Nil));
+        } else if match_token!(self, TokenType::String) {
+            return Ok(Expr::Literal(self.previous().literal.clone().unwrap()));
         } else if match_token!(self, TokenType::Identifier) {
             return Ok(Expr::Identifier(self.previous().clone()));
         }

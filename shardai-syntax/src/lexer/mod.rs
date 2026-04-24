@@ -75,6 +75,14 @@ impl Lexer {
                 None
             }
 
+            // Strings
+            '"' => {
+                let string = self.string()?;
+
+                literal = Some(LiteralValue::String(string));
+                Some(TokenType::String)
+            }
+
             // not a symbol
             _ => {
                 if self.is_digit(&c) {
@@ -161,6 +169,32 @@ impl Lexer {
         } else {
             Ok((word, TokenType::Identifier))
         }
+    }
+
+    fn string(&mut self) -> Result<String, LexError> {
+        while !self.is_at_end() && *self.peek()? != '"' {
+            if *self.peek()? == '\n' {
+                self.line += 1;
+            }
+
+            self.advance()?;
+        }
+
+        if self.is_at_end() {
+            return Err(LexError {
+                line: self.line,
+                message: ErrorMessage::UnterminatedString,
+            });
+        }
+
+        self.advance()?; // closing quote
+
+        // +1 to skip starting quote, -1 to skip closing quote
+        let literal = self.source[self.tkn_start + 1..self.source_idx - 1]
+            .iter()
+            .collect();
+
+        Ok(literal)
     }
 
     // Utils

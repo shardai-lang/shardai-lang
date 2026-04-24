@@ -32,6 +32,10 @@ impl VM {
         }
     }
 
+    pub fn heap_get(&mut self, heap_idx: usize) -> Option<&HeapObj> {
+        self.heap.get(heap_idx)
+    }
+
     pub fn run(&mut self) -> Result<Value, RuntimeError> {
         while let Some(i) = self.instructions.get(self.pc) {
             let inst = *i;

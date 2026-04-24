@@ -10,6 +10,7 @@ pub enum ErrorMessage {
     MalformedNumber(String),
     ExpectedChar(char),
     ExpectedExpression,
+    UnterminatedString,
 }
 
 impl Display for ErrorMessage {
@@ -21,6 +22,7 @@ impl Display for ErrorMessage {
             Self::MalformedNumber(s) => write!(f, "Malformed number '{}'", s),
             Self::ExpectedChar(c) => write!(f, "Expected character '{}'", c),
             Self::ExpectedExpression => write!(f, "Expected expression"),
+            Self::UnterminatedString => write!(f, "Unterminated string"),
         }
     }
 }

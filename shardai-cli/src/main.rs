@@ -4,6 +4,7 @@ use shardai_bytecode::file::BytecodeFile;
 use shardai_compiler::compiler::Compiler;
 use shardai_syntax::lexer::Lexer;
 use shardai_syntax::parser::Parser;
+use shardai_vm::value::Value;
 use shardai_vm::vm::VM;
 use std::fs::File;
 
@@ -56,7 +57,12 @@ fn run_file(file_path: &String) -> Result<(), Box<dyn std::error::Error>> {
 
     let mut vm = VM::new(read_bytecode);
     let result = vm.run()?;
-    println!("VM returned: {}", result);
+    if let Value::HeapObj(idx) = result {
+        let pretty_result = vm.heap_get(idx).unwrap();
+        println!("VM returned: {}", pretty_result);
+    } else {
+        println!("VM returned: {}", result);
+    }
 
     Ok(())
 }
