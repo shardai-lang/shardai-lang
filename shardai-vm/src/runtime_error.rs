@@ -4,3 +4,5 @@ pub enum RuntimeError {
     IllegalOperation(&'static str)
     IllegalOperation(String),
 }
+    InvalidOperation(String),
+}
