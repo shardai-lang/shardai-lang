@@ -1,6 +1,15 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
+use std::fmt::{Display, Formatter};
+
 pub enum HeapObj {
-    #[allow(dead_code)]
     String(String),
+}
+
+impl Display for HeapObj {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            HeapObj::String(_) => write!(f, "string"),
+        }
+    }
 }
