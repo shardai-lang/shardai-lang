@@ -55,10 +55,12 @@ impl Compiler {
         Ok((self.constants.len() - 1) as u8)
     }
 
-    fn emit(&mut self, opcode: Op, a: u8, b: u8, c: u8) {
+    fn emit(&mut self, opcode: Op, a: u8, b: u8, c: u8) -> usize {
         let instr = Instruction { opcode, a, b, c };
+        let instr_pos = self.instructions.len();
 
-        self.instructions.push(instr)
+        self.instructions.push(instr);
+        instr_pos
     }
 
     fn register_local(&mut self, name: String, register: u8) -> Result<(), CompileError> {
