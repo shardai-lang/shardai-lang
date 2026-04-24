@@ -14,7 +14,7 @@ pub fn build(instructions: Vec<Instruction>, constants: Vec<Constant>) -> Byteco
             constant_count: constants.len() as u16,
             instruction_count: instructions.len() as u32,
         },
-        
+
         constants,
         instructions,
     }
