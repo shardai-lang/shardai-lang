@@ -50,6 +50,7 @@ impl VM {
                 Op::Exponentiate => self.exponentiate(inst.a, inst.b, inst.c)?,
                 Op::Jump => self.jump(inst.a, inst.b)?,
                 Op::JumpIfTruthy => self.jump_if_truthy(inst.a, inst.b, inst.c)?,
+                Op::JumpIfFalsy => self.jump_if_falsy(inst.a, inst.b, inst.c)?,
 
                 Op::Return => return Ok(self.registers[inst.a as usize]),
                 Op::ReturnVoid => return Ok(Value::Void),
@@ -231,6 +232,16 @@ impl VM {
     fn jump_if_truthy(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
         let value = self.registers[c as usize];
         if self.is_truthy(&value) {
+            self.jump(a, b)?
+        }
+
+        Ok(())
+    }
+
+    #[inline]
+    fn jump_if_falsy(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
+        let value = self.registers[c as usize];
+        if !self.is_truthy(&value) {
             self.jump(a, b)?
         }
 
