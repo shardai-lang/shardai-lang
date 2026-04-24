@@ -59,7 +59,7 @@ impl VM {
         let constant = self
             .constants
             .get(b as usize)
-            .ok_or(RuntimeError::IllegalOperation("invalid constant index"))?
+            .ok_or(RuntimeError::IllegalOperation("invalid constant index".into()))?
             .clone();
 
         let register_value = if let Constant::String(s) = constant {
