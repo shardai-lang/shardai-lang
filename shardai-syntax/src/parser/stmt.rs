@@ -17,4 +17,9 @@ pub enum Stmt {
     Return {
         return_value: Option<Expr>,
     },
+    If {
+        condition: Expr,
+        if_branch: Vec<Stmt>,
+        else_branch: Option<Vec<Stmt>>
+    }
 }

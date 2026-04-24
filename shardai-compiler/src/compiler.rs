@@ -125,7 +125,8 @@ impl Compiler {
                     self.emit(Op::ReturnVoid, 0, 0, 0);
                     Ok(())
                 }
-            }
+            },
+            Stmt::If { condition, if_branch, else_branch } => unimplemented!()
         }
     }
 
