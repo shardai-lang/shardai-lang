@@ -62,6 +62,8 @@ impl Parser {
             return self.var_declaration();
         } else if match_token!(self, TokenType::Return) {
             return self.return_statement();
+        } else if match_token!(self, TokenType::If) {
+            return self.if_statement();
         }
 
         self.expression_statement()
@@ -109,6 +111,39 @@ impl Parser {
 
         self.consume(TokenType::Semicolon, ErrorMessage::ExpectedChar(';'))?;
         Ok(Stmt::Return { return_value })
+    }
+
+    fn if_statement(&mut self) -> Result<Stmt, ParseError> {
+        let condition = self.expression()?;
+        let mut if_branch = Vec::new();
+        let mut else_branch = None;
+
+        self.advance()?; // skip opening brace
+        while !self.check(TokenType::RightBrace)? {
+            if_branch.push(self.statement()?);
+        }
+
+        self.advance()?; // skip closing brace
+
+        if self.check(TokenType::Else)? {
+            let mut branch = Vec::new();
+
+            self.advance()?; // skip `else`
+            self.advance()?; // skip opening brace
+            while !self.check(TokenType::RightBrace)? {
+                branch.push(self.statement()?);
+            }
+
+            self.advance()?; // skip closing brace
+
+            else_branch = Some(branch)
+        }
+
+        Ok(Stmt::If {
+            condition,
+            if_branch,
+            else_branch,
+        })
     }
 
     // Expression parsers

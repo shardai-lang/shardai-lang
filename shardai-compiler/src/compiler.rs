@@ -55,10 +55,12 @@ impl Compiler {
         Ok((self.constants.len() - 1) as u8)
     }
 
-    fn emit(&mut self, opcode: Op, a: u8, b: u8, c: u8) {
+    fn emit(&mut self, opcode: Op, a: u8, b: u8, c: u8) -> usize {
         let instr = Instruction { opcode, a, b, c };
+        let instr_pos = self.instructions.len();
 
-        self.instructions.push(instr)
+        self.instructions.push(instr);
+        instr_pos
     }
 
     fn register_local(&mut self, name: String, register: u8) -> Result<(), CompileError> {
@@ -126,6 +128,50 @@ impl Compiler {
                     Ok(())
                 }
             }
+            Stmt::If {
+                condition,
+                if_branch,
+                else_branch,
+            } => {
+                let condition_register = self.compile_expr(condition)?;
+
+                match else_branch {
+                    // `if` only
+                    None => {
+                        let cond_jump_pos = self.emit(Op::JumpIfFalsy, 0, 0, condition_register);
+
+                        for stmt in if_branch {
+                            self.compile_stmt(stmt)?;
+                        }
+
+                        self.patch_jump(cond_jump_pos);
+
+                        Ok(())
+                    }
+
+                    // `if` and `else`
+                    Some(else_branch) => {
+                        let cond_jump_pos = self.emit(Op::JumpIfFalsy, 0, 0, condition_register);
+
+                        for stmt in if_branch {
+                            self.compile_stmt(stmt)?;
+                        }
+
+                        // jump past else block, emitted at end of if branch
+                        let end_jump_pos = self.emit(Op::Jump, 0, 0, 0);
+
+                        self.patch_jump(cond_jump_pos);
+
+                        for stmt in else_branch {
+                            self.compile_stmt(stmt)?;
+                        }
+
+                        self.patch_jump(end_jump_pos);
+
+                        Ok(())
+                    }
+                }
+            }
         }
     }
 
@@ -162,5 +208,15 @@ impl Compiler {
 
         self.emit(op, dest, left, right);
         Ok(dest)
+    }
+
+    fn patch_jump(&mut self, jump_pos: usize) {
+        // subtract one since pc will be pointing past jump instruction
+        let offset = (self.instructions.len() - jump_pos - 1) as i16;
+        let [a, b] = offset.to_le_bytes();
+        let inst = self.instructions.get_mut(jump_pos).unwrap();
+
+        inst.a = a;
+        inst.b = b;
     }
 }

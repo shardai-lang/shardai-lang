@@ -42,4 +42,8 @@ pub enum TokenType {
     Slash,
     Carat,
     String,
+    If,
+    Else,
+    LeftBrace,
+    RightBrace,
 }

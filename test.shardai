@@ -1,4 +1,9 @@
-var x = 5;
-var b = true;
+var finalString = "";
 
-return "hello " + "world!";
+if true {
+    finalString = finalString + "condition true, first branch";
+} else {
+    finalString = finalString + "condition false, second branch";
+}
+
+return finalString;
