@@ -61,6 +61,14 @@ pub enum Op {
     /// Sets register A to the power of register B ^ register C
     /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) ^ reg(c)
     Exponentiate = 8,
+
+    /// Adds A and B read as an i16 to the program counter
+    /// number(AB) -> ip += number(AB)
+    Jump = 9,
+
+    /// Adds A and B read as an i16 to the program counter if the value in register C is truthy
+    /// number(AB) reg(c) -> ip += number(AB) if reg(c)
+    JumpIfTruthy = 10
 }
 
 impl TryFrom<u8> for Op {
@@ -77,6 +85,8 @@ impl TryFrom<u8> for Op {
             6 => Ok(Op::Multiply),
             7 => Ok(Op::Divide),
             8 => Ok(Op::Exponentiate),
+            9 => Ok(Op::Jump),
+            10 => Ok(Op::JumpIfTruthy),
 
             _ => Err("Unknown opcode"),
         }
