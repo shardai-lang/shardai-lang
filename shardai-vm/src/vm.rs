@@ -1,12 +1,12 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
 use crate::heap_obj::HeapObj;
+use crate::runtime_error::RuntimeError;
 use crate::value::Value;
 use shardai_bytecode::constant::Constant;
 use shardai_bytecode::file::BytecodeFile;
 use shardai_bytecode::instruction::Instruction;
 use shardai_bytecode::opcodes::Op;
-use crate::runtime_error::RuntimeError;
 
 pub struct VM {
     instructions: Vec<Instruction>,
@@ -44,14 +44,14 @@ impl VM {
                 Op::Multiply => self.multiply(inst.a, inst.b, inst.c)?,
                 Op::Divide => self.divide(inst.a, inst.b, inst.c)?,
                 Op::Exponentiate => self.exponentiate(inst.a, inst.b, inst.c)?,
-                
+
                 Op::Return => return Ok(self.registers[inst.a as usize]),
                 Op::ReturnVoid => return Ok(Value::Void),
             }
 
             self.pc += 1;
         }
-        
+
         Ok(Value::Void)
     }
 
@@ -62,7 +62,9 @@ impl VM {
         let constant = self
             .constants
             .get(b as usize)
-            .ok_or(RuntimeError::IllegalOperation("invalid constant index".into()))?
+            .ok_or(RuntimeError::IllegalOperation(
+                "invalid constant index".into(),
+            ))?
             .clone();
 
         let register_value = if let Constant::String(s) = constant {
@@ -95,12 +97,16 @@ impl VM {
             (Value::Number(l), Value::Number(r)) => {
                 let _: () = self.registers[a as usize] = Value::Number(l + r);
                 Ok(())
-            },
+            }
             (Value::HeapObj(l_idx), Value::HeapObj(r_idx)) => {
                 let concatenated = {
-                    let l = self.heap.get(l_idx)
+                    let l = self
+                        .heap
+                        .get(l_idx)
                         .ok_or(RuntimeError::IllegalOperation("invalid heap index".into()))?;
-                    let r = self.heap.get(r_idx)
+                    let r = self
+                        .heap
+                        .get(r_idx)
                         .ok_or(RuntimeError::IllegalOperation("invalid heap index".into()))?;
 
                     match (l, r) {
@@ -112,7 +118,12 @@ impl VM {
                         }
 
                         #[allow(unreachable_patterns)]
-                        _ => return Err(RuntimeError::InvalidOperation(format!("cannot add {} and {}", l, r))),
+                        _ => {
+                            return Err(RuntimeError::InvalidOperation(format!(
+                                "cannot add {} and {}",
+                                l, r
+                            )));
+                        }
                     }
                 };
 
@@ -121,7 +132,10 @@ impl VM {
                 Ok(())
             }
 
-            _ => Err(RuntimeError::InvalidOperation(format!("cannot add {} and {}", left, right)))
+            _ => Err(RuntimeError::InvalidOperation(format!(
+                "cannot add {} and {}",
+                left, right
+            ))),
         }
     }
 
@@ -130,12 +144,17 @@ impl VM {
         let left = self.registers[b as usize];
         let right = self.registers[c as usize];
 
-        if let Value::Number(l) = left && let Value::Number(r) = right {
+        if let Value::Number(l) = left
+            && let Value::Number(r) = right
+        {
             self.registers[a as usize] = Value::Number(l - r);
-            return Ok(())
+            return Ok(());
         }
 
-        Err(RuntimeError::InvalidOperation(format!("cannot subtract {} and {}", left, right)))
+        Err(RuntimeError::InvalidOperation(format!(
+            "cannot subtract {} and {}",
+            left, right
+        )))
     }
 
     #[inline]
@@ -143,12 +162,17 @@ impl VM {
         let left = self.registers[b as usize];
         let right = self.registers[c as usize];
 
-        if let Value::Number(l) = left && let Value::Number(r) = right {
+        if let Value::Number(l) = left
+            && let Value::Number(r) = right
+        {
             self.registers[a as usize] = Value::Number(l * r);
-            return Ok(())
+            return Ok(());
         }
 
-        Err(RuntimeError::InvalidOperation(format!("cannot multiply {} and {}", left, right)))
+        Err(RuntimeError::InvalidOperation(format!(
+            "cannot multiply {} and {}",
+            left, right
+        )))
     }
 
     #[inline]
@@ -156,12 +180,17 @@ impl VM {
         let left = self.registers[b as usize];
         let right = self.registers[c as usize];
 
-        if let Value::Number(l) = left && let Value::Number(r) = right {
+        if let Value::Number(l) = left
+            && let Value::Number(r) = right
+        {
             self.registers[a as usize] = Value::Number(l / r);
-            return Ok(())
+            return Ok(());
         }
 
-        Err(RuntimeError::InvalidOperation(format!("cannot divide {} and {}", left, right)))
+        Err(RuntimeError::InvalidOperation(format!(
+            "cannot divide {} and {}",
+            left, right
+        )))
     }
 
     #[inline]
@@ -169,11 +198,16 @@ impl VM {
         let left = self.registers[b as usize];
         let right = self.registers[c as usize];
 
-        if let Value::Number(l) = left && let Value::Number(r) = right {
+        if let Value::Number(l) = left
+            && let Value::Number(r) = right
+        {
             self.registers[a as usize] = Value::Number(l.powf(r));
-            return Ok(())
+            return Ok(());
         }
 
-        Err(RuntimeError::InvalidOperation(format!("cannot exponentiate {} and {}", left, right)))
+        Err(RuntimeError::InvalidOperation(format!(
+            "cannot exponentiate {} and {}",
+            left, right
+        )))
     }
 }

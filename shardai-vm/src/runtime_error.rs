@@ -13,7 +13,7 @@ impl Display for RuntimeError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             RuntimeError::IllegalOperation(msg) => write!(f, "Illegal operation: {}", msg),
-            RuntimeError::InvalidOperation(msg) => write!(f, "Invalid operation: {}", msg)
+            RuntimeError::InvalidOperation(msg) => write!(f, "Invalid operation: {}", msg),
         }
     }
 }

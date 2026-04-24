@@ -51,7 +51,7 @@ impl Debug for Instruction {
             Op::Subtract => "SUBTRACT",
             Op::Multiply => "MULTIPLY",
             Op::Divide => "DIVIDE",
-            Op::Exponentiate => "EXPONENTIATE"
+            Op::Exponentiate => "EXPONENTIATE",
         };
 
         write!(f, "{} {} {} {}", op_name, self.a, self.b, self.c)

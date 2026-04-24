@@ -1,7 +1,7 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
-use std::fmt::{Display, Formatter};
 use shardai_bytecode::constant::Constant;
+use std::fmt::{Display, Formatter};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Value {
@@ -9,7 +9,7 @@ pub enum Value {
     Bool(bool),
     Number(f64),
     Nil,
-    Void
+    Void,
 }
 
 impl From<Constant> for Value {
@@ -30,7 +30,7 @@ impl Display for Value {
             Value::Nil => write!(f, "nil"),
             Value::Bool(b) => write!(f, "{}", b),
             Value::Number(n) => write!(f, "{}", n),
-            Value::HeapObj(idx) => write!(f, "heap[{}]", idx)
+            Value::HeapObj(idx) => write!(f, "heap[{}]", idx),
         }
     }
 }

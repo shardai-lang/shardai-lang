@@ -24,7 +24,7 @@ impl Lexer {
             ("true".into(), TokenType::True),
             ("false".into(), TokenType::False),
             ("nil".into(), TokenType::Nil),
-            ("return".into(), TokenType::Return)
+            ("return".into(), TokenType::Return),
         ]);
 
         Self {
@@ -67,7 +67,7 @@ impl Lexer {
             '/' => Some(TokenType::Slash),
             '*' => Some(TokenType::Star),
             '^' => Some(TokenType::Carat),
-            
+
             // Whitespace/special characters
             ' ' | '\r' | '\t' => None,
             '\n' => {

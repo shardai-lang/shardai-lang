@@ -60,7 +60,7 @@ pub enum Op {
 
     /// Sets register A to the power of register B ^ register C
     /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) ^ reg(c)
-    Exponentiate = 8
+    Exponentiate = 8,
 }
 
 impl TryFrom<u8> for Op {
@@ -78,7 +78,7 @@ impl TryFrom<u8> for Op {
             7 => Ok(Op::Divide),
             8 => Ok(Op::Exponentiate),
 
-            _ => Err("Unknown opcode")
+            _ => Err("Unknown opcode"),
         }
     }
 }

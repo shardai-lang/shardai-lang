@@ -115,7 +115,7 @@ impl Compiler {
                 self.compile_expr(e)?;
 
                 Ok(())
-            },
+            }
             Stmt::Return { return_value } => {
                 if let Some(v) = return_value {
                     let return_value_register = self.compile_expr(v)?;
@@ -144,11 +144,13 @@ impl Compiler {
                 .get_local(&token.lexeme)
                 .ok_or(CompileError::UnknownLocal(token.lexeme)),
 
-            Expr::Add { left, right }      => self.compile_binary_op(*left, *right, Op::Add),
-            Expr::Subtract { left, right }      => self.compile_binary_op(*left, *right, Op::Subtract),
-            Expr::Multiply { left, right }      => self.compile_binary_op(*left, *right, Op::Multiply),
-            Expr::Divide { left, right }      => self.compile_binary_op(*left, *right, Op::Divide),
-            Expr::Exponentiation { left, right }      => self.compile_binary_op(*left, *right, Op::Exponentiate),
+            Expr::Add { left, right } => self.compile_binary_op(*left, *right, Op::Add),
+            Expr::Subtract { left, right } => self.compile_binary_op(*left, *right, Op::Subtract),
+            Expr::Multiply { left, right } => self.compile_binary_op(*left, *right, Op::Multiply),
+            Expr::Divide { left, right } => self.compile_binary_op(*left, *right, Op::Divide),
+            Expr::Exponentiation { left, right } => {
+                self.compile_binary_op(*left, *right, Op::Exponentiate)
+            }
         }
     }
 

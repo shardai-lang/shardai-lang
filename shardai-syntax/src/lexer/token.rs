@@ -40,5 +40,5 @@ pub enum TokenType {
     Minus,
     Star,
     Slash,
-    Carat
+    Carat,
 }

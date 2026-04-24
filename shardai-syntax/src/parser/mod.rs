@@ -61,7 +61,7 @@ impl Parser {
         if match_token!(self, TokenType::Var) {
             return self.var_declaration();
         } else if match_token!(self, TokenType::Return) {
-            return self.return_statement()
+            return self.return_statement();
         }
 
         self.expression_statement()
@@ -126,13 +126,13 @@ impl Parser {
     fn exponentiation(&mut self) -> Result<Expr, ParseError> {
         let left = self.primary()?;
 
-        if match_token!(self, TokenType::Carat)  {
+        if match_token!(self, TokenType::Carat) {
             let right = self.exponentiation()?;
 
             return Ok(Expr::Exponentiation {
                 left: left.into(),
-                right: right.into()
-            })
+                right: right.into(),
+            });
         }
 
         Ok(left)
@@ -148,15 +148,15 @@ impl Parser {
             expr = match operation.token_type {
                 TokenType::Star => Expr::Multiply {
                     left: expr.into(),
-                    right: right.into()
+                    right: right.into(),
                 },
 
                 TokenType::Slash => Expr::Divide {
                     left: expr.into(),
-                    right: right.into()
+                    right: right.into(),
                 },
 
-                _ => unimplemented!()
+                _ => unimplemented!(),
             }
         }
 
@@ -173,15 +173,15 @@ impl Parser {
             expr = match operation.token_type {
                 TokenType::Plus => Expr::Add {
                     left: expr.into(),
-                    right: right.into()
+                    right: right.into(),
                 },
 
                 TokenType::Minus => Expr::Subtract {
                     left: expr.into(),
-                    right: right.into()
+                    right: right.into(),
                 },
 
-                _ => unreachable!()
+                _ => unreachable!(),
             }
         }
 

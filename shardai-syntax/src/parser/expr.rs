@@ -7,24 +7,9 @@ use crate::literal_value::LiteralValue;
 pub enum Expr {
     Literal(LiteralValue),
     Identifier(Token),
-    Add {
-        left: Box<Expr>,
-        right: Box<Expr>
-    },
-    Subtract {
-        left: Box<Expr>,
-        right: Box<Expr>
-    },
-    Multiply {
-        left: Box<Expr>,
-        right: Box<Expr>
-    },
-    Divide {
-        left: Box<Expr>,
-        right: Box<Expr>
-    },
-    Exponentiation {
-        left: Box<Expr>,
-        right: Box<Expr>
-    },
+    Add { left: Box<Expr>, right: Box<Expr> },
+    Subtract { left: Box<Expr>, right: Box<Expr> },
+    Multiply { left: Box<Expr>, right: Box<Expr> },
+    Divide { left: Box<Expr>, right: Box<Expr> },
+    Exponentiation { left: Box<Expr>, right: Box<Expr> },
 }

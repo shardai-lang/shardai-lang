@@ -15,6 +15,6 @@ pub enum Stmt {
         value: Expr,
     },
     Return {
-        return_value: Option<Expr>
-    }
+        return_value: Option<Expr>,
+    },
 }
