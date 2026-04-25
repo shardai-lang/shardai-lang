@@ -105,6 +105,10 @@ pub enum Op {
     /// Sets register A to if register B is not equal to register C
     /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) != reg(c)
     NotEquals = 19,
+
+    /// Sets register A to the remainder of register B % register C
+    /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) % reg(c)
+    Modulo = 20,
 }
 
 impl TryFrom<u8> for Op {
@@ -132,6 +136,7 @@ impl TryFrom<u8> for Op {
             17 => Ok(Op::LessEqualThan),
             18 => Ok(Op::Equals),
             19 => Ok(Op::NotEquals),
+            20 => Ok(Op::Modulo),
 
             _ => Err("Unknown opcode"),
         }

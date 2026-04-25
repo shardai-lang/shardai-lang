@@ -209,6 +209,7 @@ impl Compiler {
             }
             Expr::Equals { left, right } => self.compile_binary_op(*left, *right, Op::Equals),
             Expr::NotEquals { left, right } => self.compile_binary_op(*left, *right, Op::NotEquals),
+            Expr::Modulo { left, right } => self.compile_binary_op(*left, *right, Op::Modulo),
 
             Expr::Not { operand } => {
                 let source_register = self.compile_expr(*operand)?;

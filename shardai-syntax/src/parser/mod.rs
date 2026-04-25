@@ -184,7 +184,7 @@ impl Parser {
     fn factor(&mut self) -> Result<Expr, ParseError> {
         let mut expr = self.exponentiation()?;
 
-        while match_token!(self, TokenType::Star, TokenType::Slash) {
+        while match_token!(self, TokenType::Star, TokenType::Slash, TokenType::Percent) {
             let operation = self.previous().clone();
             let right = self.exponentiation()?;
 
@@ -195,6 +195,11 @@ impl Parser {
                 },
 
                 TokenType::Slash => Expr::Divide {
+                    left: expr.into(),
+                    right: right.into(),
+                },
+
+                TokenType::Percent => Expr::Modulo {
                     left: expr.into(),
                     right: right.into(),
                 },

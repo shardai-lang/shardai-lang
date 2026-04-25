@@ -8,4 +8,4 @@ if 5 > 10 and true or not false {
     finalString = finalString + "condition false, else branch";
 }
 
-return finalString;
+return 133 % 7;

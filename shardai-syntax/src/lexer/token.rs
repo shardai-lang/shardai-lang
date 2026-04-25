@@ -55,4 +55,5 @@ pub enum TokenType {
     And,
     Not,
     Or,
+    Percent,
 }

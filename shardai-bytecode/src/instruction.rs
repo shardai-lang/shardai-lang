@@ -63,6 +63,7 @@ impl Debug for Instruction {
             Op::LessEqualThan => "LESSEQUALTHAN",
             Op::Equals => "EQUALS",
             Op::NotEquals => "NOTEQUALS",
+            Op::Modulo => "MODULO",
         };
 
         write!(f, "{} {} {} {}", op_name, self.a, self.b, self.c)

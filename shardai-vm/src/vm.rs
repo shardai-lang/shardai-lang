@@ -59,6 +59,7 @@ impl VM {
                 Op::LessEqualThan => self.less_equal_than(inst.a, inst.b, inst.c)?,
                 Op::Equals => self.equals(inst.a, inst.b, inst.c)?,
                 Op::NotEquals => self.not_equals(inst.a, inst.b, inst.c)?,
+                Op::Modulo => self.modulo(inst.a, inst.b, inst.c)?,
 
                 Op::Return => return Ok(self.registers[inst.a as usize]),
                 Op::ReturnVoid => return Ok(Value::Void),
@@ -246,6 +247,24 @@ impl VM {
         Err(RuntimeError::InvalidOperation(format!(
             "cannot negate {}",
             value
+        )))
+    }
+
+    #[inline]
+    fn modulo(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
+        let left = self.registers[b as usize];
+        let right = self.registers[c as usize];
+
+        if let Value::Number(l) = left
+            && let Value::Number(r) = right
+        {
+            self.registers[a as usize] = Value::Number(l.rem_euclid(r));
+            return Ok(());
+        }
+
+        Err(RuntimeError::InvalidOperation(format!(
+            "cannot divide {} and {}",
+            left, right
         )))
     }
 

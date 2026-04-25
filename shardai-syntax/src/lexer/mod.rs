@@ -73,6 +73,7 @@ impl Lexer {
             '^' => Some(TokenType::Carat),
             '{' => Some(TokenType::LeftBrace),
             '}' => Some(TokenType::RightBrace),
+            '%' => Some(TokenType::Percent),
 
             // Whitespace/special characters
             ' ' | '\r' | '\t' => None,

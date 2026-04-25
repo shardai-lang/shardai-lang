@@ -23,4 +23,5 @@ pub enum Expr {
     LessEqualThan { left: Box<Expr>, right: Box<Expr> },
     Not { operand: Box<Expr> },
     Negate { operand: Box<Expr> },
+    Modulo { left: Box<Expr>, right: Box<Expr> },
 }
