@@ -8,4 +8,4 @@ if 5 > 10 and true or not false {
     finalString = finalString + "condition false, else branch";
 }
 
-return 133 % 7;
+return 3 * ((2+5) * 5);

@@ -296,6 +296,11 @@ impl Parser {
             return Ok(Expr::Literal(self.previous().literal.clone().unwrap()));
         } else if match_token!(self, TokenType::Identifier) {
             return Ok(Expr::Identifier(self.previous().clone()));
+        } else if match_token!(self, TokenType::LeftParen) {
+            let expr = self.expression()?;
+            self.consume(TokenType::RightParen, ErrorMessage::ExpectedChar(')'))?;
+
+            return Ok(Expr::Group { expr: expr.into() });
         }
 
         Err(ParseError { token: self.peek().clone(), message: ErrorMessage::ExpectedExpression })
