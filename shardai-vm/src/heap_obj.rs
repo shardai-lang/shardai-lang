@@ -2,6 +2,7 @@
 
 use std::fmt::{Debug, Display, Formatter};
 
+#[derive(PartialEq)]
 pub enum HeapObj {
     String(String),
 }
