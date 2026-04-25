@@ -106,7 +106,7 @@ impl From<LiteralValue> for Constant {
 impl Debug for Constant {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Constant::String(s) => write!(f, "Constant({})", s),
+            Constant::String(s) => write!(f, "Constant(\"{}\")", s),
             Constant::Number(n) => write!(f, "Constant({})", n),
             Constant::Bool(b) => write!(f, "Constant({})", b),
             Constant::Nil => write!(f, "Constant(nil)"),
