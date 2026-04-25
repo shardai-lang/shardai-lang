@@ -6,20 +6,8 @@ use crate::parser::expr::Expr;
 #[derive(Debug)]
 pub enum Stmt {
     Expr(Expr),
-    Var {
-        name: Token,
-        initializer: Option<Expr>,
-    },
-    Assign {
-        target: Expr,
-        value: Expr,
-    },
-    Return {
-        return_value: Option<Expr>,
-    },
-    If {
-        condition: Expr,
-        if_branch: Vec<Stmt>,
-        else_branch: Option<Vec<Stmt>>,
-    },
+    Var { name: Token, initializer: Option<Expr> },
+    Assign { target: Expr, value: Expr },
+    Return { return_value: Option<Expr> },
+    If { condition: Expr, if_branch: Vec<Stmt>, else_branch: Option<Vec<Stmt>> },
 }

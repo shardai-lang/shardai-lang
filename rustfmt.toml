@@ -1,1 +1,3 @@
-max_width = 128
+max_width = 120
+chain_width = 60
+use_small_heuristics = "Max"

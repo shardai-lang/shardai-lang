@@ -89,22 +89,14 @@ impl Parser {
             .consume(TokenType::Identifier, ErrorMessage::ExpectedIdentifier("var"))?
             .clone();
 
-        let initializer = if match_token!(self, TokenType::Equals) {
-            Some(self.expression()?)
-        } else {
-            None
-        };
+        let initializer = if match_token!(self, TokenType::Equals) { Some(self.expression()?) } else { None };
 
         self.consume(TokenType::Semicolon, ErrorMessage::ExpectedChar(';'))?;
         Ok(Stmt::Var { name, initializer })
     }
 
     fn return_statement(&mut self) -> Result<Stmt, ParseError> {
-        let return_value = if !self.check(TokenType::Semicolon)? {
-            Some(self.expression()?)
-        } else {
-            None
-        };
+        let return_value = if !self.check(TokenType::Semicolon)? { Some(self.expression()?) } else { None };
 
         self.consume(TokenType::Semicolon, ErrorMessage::ExpectedChar(';'))?;
         Ok(Stmt::Return { return_value })
@@ -144,11 +136,7 @@ impl Parser {
             }
         }
 
-        Ok(Stmt::If {
-            condition,
-            if_branch,
-            else_branch,
-        })
+        Ok(Stmt::If { condition, if_branch, else_branch })
     }
 
     // Expression parsers
@@ -169,10 +157,7 @@ impl Parser {
         if match_token!(self, TokenType::Carat) {
             let right = self.exponentiation()?;
 
-            return Ok(Expr::Exponentiation {
-                left: left.into(),
-                right: right.into(),
-            });
+            return Ok(Expr::Exponentiation { left: left.into(), right: right.into() });
         }
 
         Ok(left)
@@ -186,20 +171,11 @@ impl Parser {
             let right = self.exponentiation()?;
 
             expr = match operation.token_type {
-                TokenType::Star => Expr::Multiply {
-                    left: expr.into(),
-                    right: right.into(),
-                },
+                TokenType::Star => Expr::Multiply { left: expr.into(), right: right.into() },
 
-                TokenType::Slash => Expr::Divide {
-                    left: expr.into(),
-                    right: right.into(),
-                },
+                TokenType::Slash => Expr::Divide { left: expr.into(), right: right.into() },
 
-                TokenType::Percent => Expr::Modulo {
-                    left: expr.into(),
-                    right: right.into(),
-                },
+                TokenType::Percent => Expr::Modulo { left: expr.into(), right: right.into() },
 
                 _ => unimplemented!(),
             }
@@ -216,15 +192,9 @@ impl Parser {
             let right = self.factor()?;
 
             expr = match operation.token_type {
-                TokenType::Plus => Expr::Add {
-                    left: expr.into(),
-                    right: right.into(),
-                },
+                TokenType::Plus => Expr::Add { left: expr.into(), right: right.into() },
 
-                TokenType::Minus => Expr::Subtract {
-                    left: expr.into(),
-                    right: right.into(),
-                },
+                TokenType::Minus => Expr::Subtract { left: expr.into(), right: right.into() },
 
                 _ => unreachable!(),
             }
@@ -239,10 +209,7 @@ impl Parser {
         while match_token!(self, TokenType::Or) {
             let right = self.and()?;
 
-            expr = Expr::Or {
-                left: expr.into(),
-                right: right.into(),
-            }
+            expr = Expr::Or { left: expr.into(), right: right.into() }
         }
 
         Ok(expr)
@@ -254,10 +221,7 @@ impl Parser {
         while match_token!(self, TokenType::And) {
             let right = self.equality()?;
 
-            expr = Expr::And {
-                left: expr.into(),
-                right: right.into(),
-            }
+            expr = Expr::And { left: expr.into(), right: right.into() }
         }
 
         Ok(expr)
@@ -271,15 +235,9 @@ impl Parser {
             let right = self.comparison()?;
 
             expr = match operation.token_type {
-                TokenType::BangEqual => Expr::NotEquals {
-                    left: expr.into(),
-                    right: right.into(),
-                },
+                TokenType::BangEqual => Expr::NotEquals { left: expr.into(), right: right.into() },
 
-                TokenType::EqualEqual => Expr::Equals {
-                    left: expr.into(),
-                    right: right.into(),
-                },
+                TokenType::EqualEqual => Expr::Equals { left: expr.into(), right: right.into() },
 
                 _ => unreachable!(),
             }
@@ -291,36 +249,18 @@ impl Parser {
     fn comparison(&mut self) -> Result<Expr, ParseError> {
         let mut expr = self.term()?;
 
-        while match_token!(
-            self,
-            TokenType::Greater,
-            TokenType::GreaterEqual,
-            TokenType::Less,
-            TokenType::LessEqual
-        ) {
+        while match_token!(self, TokenType::Greater, TokenType::GreaterEqual, TokenType::Less, TokenType::LessEqual) {
             let operation = self.previous().clone();
             let right = self.term()?;
 
             expr = match operation.token_type {
-                TokenType::Greater => Expr::GreaterThan {
-                    left: expr.into(),
-                    right: right.into(),
-                },
+                TokenType::Greater => Expr::GreaterThan { left: expr.into(), right: right.into() },
 
-                TokenType::GreaterEqual => Expr::GreaterEqualThan {
-                    left: expr.into(),
-                    right: right.into(),
-                },
+                TokenType::GreaterEqual => Expr::GreaterEqualThan { left: expr.into(), right: right.into() },
 
-                TokenType::Less => Expr::LessThan {
-                    left: expr.into(),
-                    right: right.into(),
-                },
+                TokenType::Less => Expr::LessThan { left: expr.into(), right: right.into() },
 
-                TokenType::LessEqual => Expr::LessEqualThan {
-                    left: expr.into(),
-                    right: right.into(),
-                },
+                TokenType::LessEqual => Expr::LessEqualThan { left: expr.into(), right: right.into() },
 
                 _ => unreachable!(),
             }
@@ -358,10 +298,7 @@ impl Parser {
             return Ok(Expr::Identifier(self.previous().clone()));
         }
 
-        Err(ParseError {
-            token: self.peek().clone(),
-            message: ErrorMessage::ExpectedExpression,
-        })
+        Err(ParseError { token: self.peek().clone(), message: ErrorMessage::ExpectedExpression })
     }
 
     // Helper methods
@@ -387,10 +324,7 @@ impl Parser {
 
             Ok(self.tokens.get(self.current - 1).unwrap())
         } else {
-            Err(ParseError {
-                token: self.peek().clone(),
-                message: ErrorMessage::UnexpectedEof,
-            })
+            Err(ParseError { token: self.peek().clone(), message: ErrorMessage::UnexpectedEof })
         }
     }
 
@@ -403,13 +337,6 @@ impl Parser {
     }
 
     fn consume(&mut self, token_type: TokenType, message: ErrorMessage) -> Result<&Token, ParseError> {
-        if self.check(token_type)? {
-            self.advance()
-        } else {
-            Err(ParseError {
-                token: self.peek().clone(),
-                message,
-            })
-        }
+        if self.check(token_type)? { self.advance() } else { Err(ParseError { token: self.peek().clone(), message }) }
     }
 }

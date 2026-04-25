@@ -28,12 +28,7 @@ impl Default for Compiler {
 
 impl Compiler {
     pub fn new() -> Self {
-        Self {
-            next_register: 0,
-            locals: HashMap::new(),
-            constants: Vec::new(),
-            instructions: Vec::new(),
-        }
+        Self { next_register: 0, locals: HashMap::new(), constants: Vec::new(), instructions: Vec::new() }
     }
 
     fn build_header(&self) -> BytecodeHeader {
@@ -128,11 +123,7 @@ impl Compiler {
                     Ok(())
                 }
             }
-            Stmt::If {
-                condition,
-                if_branch,
-                else_branch,
-            } => {
+            Stmt::If { condition, if_branch, else_branch } => {
                 let condition_register = self.compile_expr(condition)?;
 
                 match else_branch {
@@ -186,7 +177,9 @@ impl Compiler {
                 Ok(dest)
             }
 
-            Expr::Identifier(token) => self.get_local(&token.lexeme).ok_or(CompileError::UnknownLocal(token.lexeme)),
+            Expr::Identifier(token) => self
+                .get_local(&token.lexeme)
+                .ok_or(CompileError::UnknownLocal(token.lexeme)),
 
             Expr::Add { left, right } => self.compile_binary_op(*left, *right, Op::Add),
             Expr::Subtract { left, right } => self.compile_binary_op(*left, *right, Op::Subtract),

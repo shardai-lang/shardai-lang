@@ -56,8 +56,8 @@ impl Constant {
                 let mut string_bytes = vec![0u8; length as usize];
                 reader.read_exact(&mut string_bytes)?;
 
-                let string =
-                    String::from_utf8(string_bytes).map_err(|e| io::Error::new(ErrorKind::InvalidData, e.to_string()))?;
+                let string = String::from_utf8(string_bytes)
+                    .map_err(|e| io::Error::new(ErrorKind::InvalidData, e.to_string()))?;
 
                 Ok(Self::String(string))
             }

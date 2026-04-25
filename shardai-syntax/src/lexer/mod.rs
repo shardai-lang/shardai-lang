@@ -32,13 +32,7 @@ impl Lexer {
             ("not".into(), TokenType::Not),
         ]);
 
-        Self {
-            source: source.chars().collect(),
-            keywords,
-            line: 0,
-            source_idx: 0,
-            tkn_start: 0,
-        }
+        Self { source: source.chars().collect(), keywords, line: 0, source_idx: 0, tkn_start: 0 }
     }
 
     // Lexer entrypoint
@@ -137,25 +131,18 @@ impl Lexer {
                     literal = Some(LiteralValue::String(identifier));
                     Some(token_type)
                 } else {
-                    return Err(LexError {
-                        line: self.line,
-                        message: ErrorMessage::UnexpectedChar(c),
-                    });
+                    return Err(LexError { line: self.line, message: ErrorMessage::UnexpectedChar(c) });
                 }
             }
         };
 
         if let Some(token_type) = token {
-            let lexeme = self.source[self.tkn_start..self.source_idx].iter().collect();
+            let lexeme = self.source[self.tkn_start..self.source_idx]
+                .iter()
+                .collect();
             let length = self.source_idx - self.tkn_start;
 
-            Ok(Some(Token {
-                start: self.tkn_start,
-                lexeme,
-                token_type,
-                length,
-                literal,
-            }))
+            Ok(Some(Token { start: self.tkn_start, lexeme, token_type, length, literal }))
         } else {
             Ok(None)
         }
@@ -180,11 +167,12 @@ impl Lexer {
             self.consume_digits()?;
         }
 
-        let num_str: String = self.source[self.tkn_start..self.source_idx].iter().collect();
-        num_str.parse::<f64>().map_err(|_| LexError {
-            line: self.line,
-            message: ErrorMessage::MalformedNumber(num_str),
-        })
+        let num_str: String = self.source[self.tkn_start..self.source_idx]
+            .iter()
+            .collect();
+        num_str
+            .parse::<f64>()
+            .map_err(|_| LexError { line: self.line, message: ErrorMessage::MalformedNumber(num_str) })
     }
 
     fn consume_letters(&mut self) -> Result<(), LexError> {
@@ -198,12 +186,10 @@ impl Lexer {
     fn identifier(&mut self) -> Result<(String, TokenType), LexError> {
         self.consume_letters()?;
 
-        let word = self.source[self.tkn_start..self.source_idx].iter().collect();
-        if let Some(kw) = self.keywords.get(&word) {
-            Ok((word, kw.clone()))
-        } else {
-            Ok((word, TokenType::Identifier))
-        }
+        let word = self.source[self.tkn_start..self.source_idx]
+            .iter()
+            .collect();
+        if let Some(kw) = self.keywords.get(&word) { Ok((word, kw.clone())) } else { Ok((word, TokenType::Identifier)) }
     }
 
     fn string(&mut self) -> Result<String, LexError> {
@@ -216,16 +202,15 @@ impl Lexer {
         }
 
         if self.is_at_end() {
-            return Err(LexError {
-                line: self.line,
-                message: ErrorMessage::UnterminatedString,
-            });
+            return Err(LexError { line: self.line, message: ErrorMessage::UnterminatedString });
         }
 
         self.advance()?; // closing quote
 
         // +1 to skip starting quote, -1 to skip closing quote
-        let literal = self.source[self.tkn_start + 1..self.source_idx - 1].iter().collect();
+        let literal = self.source[self.tkn_start + 1..self.source_idx - 1]
+            .iter()
+            .collect();
 
         Ok(literal)
     }
@@ -236,17 +221,15 @@ impl Lexer {
     }
 
     fn peek(&self) -> Result<&char, LexError> {
-        self.source.get(self.source_idx).ok_or(LexError {
-            line: self.source_idx,
-            message: ErrorMessage::UnexpectedEof,
-        })
+        self.source
+            .get(self.source_idx)
+            .ok_or(LexError { line: self.source_idx, message: ErrorMessage::UnexpectedEof })
     }
 
     fn peek_next(&self) -> Result<&char, LexError> {
-        self.source.get(self.source_idx + 1).ok_or(LexError {
-            line: self.source_idx,
-            message: ErrorMessage::UnexpectedEof,
-        })
+        self.source
+            .get(self.source_idx + 1)
+            .ok_or(LexError { line: self.source_idx, message: ErrorMessage::UnexpectedEof })
     }
 
     fn advance(&mut self) -> Result<char, LexError> {

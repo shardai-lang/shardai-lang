@@ -14,13 +14,7 @@ pub struct Token {
 
 impl Token {
     pub fn eof(pos: usize) -> Self {
-        Self {
-            literal: None,
-            lexeme: "".into(),
-            token_type: TokenType::Eof,
-            start: pos,
-            length: 0,
-        }
+        Self { literal: None, lexeme: "".into(), token_type: TokenType::Eof, start: pos, length: 0 }
     }
 }
 

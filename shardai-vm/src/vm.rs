@@ -23,13 +23,7 @@ impl VM {
         let registers = vec![Value::Void; 256];
         let heap = Vec::new();
 
-        Self {
-            instructions,
-            registers,
-            constants,
-            heap,
-            pc: 0,
-        }
+        Self { instructions, registers, constants, heap, pc: 0 }
     }
 
     pub fn heap_get(&mut self, heap_idx: usize) -> Option<&HeapObj> {
@@ -128,6 +122,7 @@ impl VM {
                             let mut s = String::with_capacity(l_str.len() + r_str.len());
                             s.push_str(l_str);
                             s.push_str(r_str);
+
                             s
                         }
 
@@ -159,10 +154,7 @@ impl VM {
             return Ok(());
         }
 
-        Err(RuntimeError::InvalidOperation(format!(
-            "cannot subtract {} and {}",
-            left, right
-        )))
+        Err(RuntimeError::InvalidOperation(format!("cannot subtract {} and {}", left, right)))
     }
 
     #[inline]
@@ -177,10 +169,7 @@ impl VM {
             return Ok(());
         }
 
-        Err(RuntimeError::InvalidOperation(format!(
-            "cannot multiply {} and {}",
-            left, right
-        )))
+        Err(RuntimeError::InvalidOperation(format!("cannot multiply {} and {}", left, right)))
     }
 
     #[inline]
@@ -195,10 +184,7 @@ impl VM {
             return Ok(());
         }
 
-        Err(RuntimeError::InvalidOperation(format!(
-            "cannot divide {} and {}",
-            left, right
-        )))
+        Err(RuntimeError::InvalidOperation(format!("cannot divide {} and {}", left, right)))
     }
 
     #[inline]
@@ -213,10 +199,7 @@ impl VM {
             return Ok(());
         }
 
-        Err(RuntimeError::InvalidOperation(format!(
-            "cannot exponentiate {} and {}",
-            left, right
-        )))
+        Err(RuntimeError::InvalidOperation(format!("cannot exponentiate {} and {}", left, right)))
     }
 
     #[inline]
@@ -251,10 +234,7 @@ impl VM {
             return Ok(());
         }
 
-        Err(RuntimeError::InvalidOperation(format!(
-            "cannot divide {} and {}",
-            left, right
-        )))
+        Err(RuntimeError::InvalidOperation(format!("cannot divide {} and {}", left, right)))
     }
 
     #[inline]
@@ -284,10 +264,7 @@ impl VM {
             return Ok(());
         }
 
-        Err(RuntimeError::InvalidOperation(format!(
-            "cannot compare {} >= {}",
-            left, right
-        )))
+        Err(RuntimeError::InvalidOperation(format!("cannot compare {} >= {}", left, right)))
     }
 
     #[inline]
@@ -317,10 +294,7 @@ impl VM {
             return Ok(());
         }
 
-        Err(RuntimeError::InvalidOperation(format!(
-            "cannot compare {} <= {}",
-            left, right
-        )))
+        Err(RuntimeError::InvalidOperation(format!("cannot compare {} <= {}", left, right)))
     }
 
     #[inline]

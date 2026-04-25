@@ -41,10 +41,6 @@ impl BytecodeFile {
             instructions.push(Instruction::read(reader)?)
         }
 
-        Ok(Self {
-            header,
-            constants,
-            instructions,
-        })
+        Ok(Self { header, constants, instructions })
     }
 }

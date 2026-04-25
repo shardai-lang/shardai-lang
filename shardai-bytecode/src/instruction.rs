@@ -29,7 +29,8 @@ impl Instruction {
         reader.read_exact(&mut opcode_bytes)?;
         reader.read_exact(&mut aux_bytes)?;
 
-        let opcode = Op::try_from(u8::from_le_bytes(opcode_bytes)).map_err(|e| io::Error::new(ErrorKind::InvalidData, e))?;
+        let opcode =
+            Op::try_from(u8::from_le_bytes(opcode_bytes)).map_err(|e| io::Error::new(ErrorKind::InvalidData, e))?;
 
         let a = aux_bytes[0];
         let b = aux_bytes[1];
