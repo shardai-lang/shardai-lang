@@ -245,8 +245,7 @@ impl Compiler {
                 self.emit(Op::Move, destination_register, left_register, 0);
                 let short_circuit = self.emit(Op::JumpIfTruthy, 0, 0, left_register);
 
-                let right_register = self.next_register;
-                self.next_register += 1;
+                let right_register = self.compile_expr(*right)?;
                 self.emit(Op::Move, destination_register, right_register, 0);
 
                 self.patch_jump(short_circuit);
