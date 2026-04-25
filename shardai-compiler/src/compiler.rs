@@ -251,8 +251,6 @@ impl Compiler {
                 self.patch_jump(short_circuit);
                 Ok(destination_register)
             }
-
-            _ => unimplemented!()
         }
     }
 
