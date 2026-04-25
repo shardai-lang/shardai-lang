@@ -27,6 +27,9 @@ impl Lexer {
             ("return".into(), TokenType::Return),
             ("if".into(), TokenType::If),
             ("else".into(), TokenType::Else),
+            ("and".into(), TokenType::And),
+            ("or".into(), TokenType::Or),
+            ("not".into(), TokenType::Not)
         ]);
 
         Self {
@@ -60,7 +63,6 @@ impl Lexer {
 
         let c = self.advance()?;
         let token = match c {
-            '=' => Some(TokenType::Equals),
             ';' => Some(TokenType::Semicolon),
 
             // Math operators
@@ -85,6 +87,40 @@ impl Lexer {
 
                 literal = Some(LiteralValue::String(string));
                 Some(TokenType::String)
+            }
+
+            // Multi-character symbols
+            '=' => {
+                if *self.peek()? == '=' {
+                    self.advance()?;
+                    Some(TokenType::EqualEqual)
+                } else {
+                    Some(TokenType::Equals)
+                }
+            }
+            '>' => {
+                if *self.peek()? == '=' {
+                    self.advance()?;
+                    Some(TokenType::GreaterEqual)
+                } else {
+                    Some(TokenType::Greater)
+                }
+            }
+            '<' => {
+                if *self.peek()? == '=' {
+                    self.advance()?;
+                    Some(TokenType::LessEqual)
+                } else {
+                    Some(TokenType::Less)
+                }
+            }
+            '!' => {
+                if *self.peek()? == '=' {
+                    self.advance()?;
+                    Some(TokenType::BangEqual)
+                } else {
+                    None
+                }
             }
 
             // not a symbol

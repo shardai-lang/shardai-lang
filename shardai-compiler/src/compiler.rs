@@ -197,6 +197,8 @@ impl Compiler {
             Expr::Exponentiation { left, right } => {
                 self.compile_binary_op(*left, *right, Op::Exponentiate)
             }
+
+            _ => unimplemented!()
         }
     }
 

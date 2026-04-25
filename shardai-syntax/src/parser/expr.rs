@@ -12,4 +12,15 @@ pub enum Expr {
     Multiply { left: Box<Expr>, right: Box<Expr> },
     Divide { left: Box<Expr>, right: Box<Expr> },
     Exponentiation { left: Box<Expr>, right: Box<Expr> },
+
+    Or { left: Box<Expr>, right: Box<Expr> },
+    And { left: Box<Expr>, right: Box<Expr> },
+    Equals { left: Box<Expr>, right: Box<Expr> },
+    NotEquals { left: Box<Expr>, right: Box<Expr> },
+    GreaterThan { left: Box<Expr>, right: Box<Expr> },
+    GreaterEqualThan { left: Box<Expr>, right: Box<Expr> },
+    LessThan { left: Box<Expr>, right: Box<Expr> },
+    LessEqualThan { left: Box<Expr>, right: Box<Expr> },
+    Not { operand: Box<Expr> },
+    Negate { operand: Box<Expr> },
 }

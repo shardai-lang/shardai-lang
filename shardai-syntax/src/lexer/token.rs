@@ -46,4 +46,13 @@ pub enum TokenType {
     Else,
     LeftBrace,
     RightBrace,
+    Greater,
+    Less,
+    GreaterEqual,
+    LessEqual,
+    EqualEqual,
+    BangEqual,
+    And,
+    Not,
+    Or,
 }

@@ -1,8 +1,8 @@
 var finalString = "";
 
-if true {
+if 5 > 10 and true or not false {
     finalString = finalString + "condition true, if branch";
-} else if false {
+} else if false == true {
     finalString = finalString + "this should never be possible, else if branch";
 } else {
     finalString = finalString + "condition false, else branch";

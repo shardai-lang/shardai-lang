@@ -163,11 +163,11 @@ impl Parser {
     // while right associative functions call themselves.
     // Left associative is `Add(Add(1,2),3)`, while right associative is `Exp(2,Exp(3,4))`
     fn expression(&mut self) -> Result<Expr, ParseError> {
-        self.term()
+        self.or()
     }
 
     fn exponentiation(&mut self) -> Result<Expr, ParseError> {
-        let left = self.primary()?;
+        let left = self.unary()?;
 
         if match_token!(self, TokenType::Carat) {
             let right = self.exponentiation()?;
@@ -229,6 +229,104 @@ impl Parser {
         }
 
         Ok(expr)
+    }
+
+    fn or(&mut self) -> Result<Expr, ParseError> {
+        let mut expr = self.and()?;
+
+        while match_token!(self, TokenType::Or) {
+            let right = self.and()?;
+
+            expr = Expr::Or {left: expr.into(), right: right.into()}
+        }
+
+        Ok(expr)
+    }
+
+    fn and(&mut self) -> Result<Expr, ParseError> {
+        let mut expr = self.equality()?;
+
+        while match_token!(self, TokenType::And) {
+            let right = self.equality()?;
+
+            expr = Expr::And {left: expr.into(), right: right.into()}
+        }
+
+        Ok(expr)
+    }
+
+    fn equality(&mut self) -> Result<Expr, ParseError> {
+        let mut expr = self.comparison()?;
+
+        while match_token!(self, TokenType::BangEqual, TokenType::EqualEqual) {
+            let operation = self.previous().clone();
+            let right = self.comparison()?;
+
+            expr = match operation.token_type {
+                TokenType::BangEqual => Expr::NotEquals {
+                    left: expr.into(),
+                    right: right.into(),
+                },
+
+                TokenType::EqualEqual => Expr::Equals {
+                    left: expr.into(),
+                    right: right.into(),
+                },
+
+                _ => unreachable!(),
+            }
+        }
+
+        Ok(expr)
+    }
+
+    fn comparison(&mut self) -> Result<Expr, ParseError> {
+        let mut expr = self.term()?;
+
+        while match_token!(self, TokenType::Greater, TokenType::GreaterEqual, TokenType::Less, TokenType::LessEqual) {
+            let operation = self.previous().clone();
+            let right = self.term()?;
+
+            expr = match operation.token_type {
+                TokenType::Greater => Expr::GreaterThan {
+                    left: expr.into(),
+                    right: right.into(),
+                },
+
+                TokenType::GreaterEqual => Expr::GreaterEqualThan {
+                    left: expr.into(),
+                    right: right.into(),
+                },
+
+                TokenType::Less => Expr::LessThan {
+                    left: expr.into(),
+                    right: right.into()
+                },
+
+                TokenType::LessEqual => Expr::LessEqualThan {
+                    left: expr.into(),
+                    right: right.into()
+                },
+
+                _ => unreachable!(),
+            }
+        }
+
+        Ok(expr)
+    }
+
+    fn unary(&mut self) -> Result<Expr, ParseError> {
+        if match_token!(self, TokenType::Not) {
+            let operand = self.unary()?;
+            return Ok(Expr::Not { operand: operand.into() });
+        }
+
+        if match_token!(self, TokenType::Minus) {
+            let operand = self.unary()?;
+            return Ok(Expr::Negate { operand: operand.into() });
+        }
+
+        self.primary()
     }
 
     fn primary(&mut self) -> Result<Expr, ParseError> {
