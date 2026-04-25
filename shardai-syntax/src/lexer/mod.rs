@@ -60,6 +60,8 @@ impl Lexer {
             ';' => Some(TokenType::Semicolon),
             '{' => Some(TokenType::LeftBrace),
             '}' => Some(TokenType::RightBrace),
+            '(' => Some(TokenType::LeftParen),
+            ')' => Some(TokenType::RightParen),
 
             // Math operators
             '+' => Some(TokenType::Plus),

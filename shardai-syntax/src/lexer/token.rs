@@ -50,4 +50,6 @@ pub enum TokenType {
     Not,
     Or,
     Percent,
+    LeftParen,
+    RightParen,
 }
