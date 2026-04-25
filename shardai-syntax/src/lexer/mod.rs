@@ -29,7 +29,7 @@ impl Lexer {
             ("else".into(), TokenType::Else),
             ("and".into(), TokenType::And),
             ("or".into(), TokenType::Or),
-            ("not".into(), TokenType::Not)
+            ("not".into(), TokenType::Not),
         ]);
 
         Self {

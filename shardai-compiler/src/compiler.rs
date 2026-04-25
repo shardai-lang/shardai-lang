@@ -194,11 +194,19 @@ impl Compiler {
             Expr::Subtract { left, right } => self.compile_binary_op(*left, *right, Op::Subtract),
             Expr::Multiply { left, right } => self.compile_binary_op(*left, *right, Op::Multiply),
             Expr::Divide { left, right } => self.compile_binary_op(*left, *right, Op::Divide),
-            Expr::Exponentiation { left, right } => self.compile_binary_op(*left, *right, Op::Exponentiate),
-            Expr::GreaterThan { left, right } => self.compile_binary_op(*left, *right, Op::GreaterThan),
-            Expr::GreaterEqualThan { left, right } => self.compile_binary_op(*left, *right, Op::GreaterEqualThan),
+            Expr::Exponentiation { left, right } => {
+                self.compile_binary_op(*left, *right, Op::Exponentiate)
+            }
+            Expr::GreaterThan { left, right } => {
+                self.compile_binary_op(*left, *right, Op::GreaterThan)
+            }
+            Expr::GreaterEqualThan { left, right } => {
+                self.compile_binary_op(*left, *right, Op::GreaterEqualThan)
+            }
             Expr::LessThan { left, right } => self.compile_binary_op(*left, *right, Op::LessThan),
-            Expr::LessEqualThan { left, right } => self.compile_binary_op(*left, *right, Op::LessEqualThan),
+            Expr::LessEqualThan { left, right } => {
+                self.compile_binary_op(*left, *right, Op::LessEqualThan)
+            }
             Expr::Equals { left, right } => self.compile_binary_op(*left, *right, Op::Equals),
             Expr::NotEquals { left, right } => self.compile_binary_op(*left, *right, Op::NotEquals),
 

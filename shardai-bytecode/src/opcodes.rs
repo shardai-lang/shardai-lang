@@ -104,7 +104,7 @@ pub enum Op {
 
     /// Sets register A to if register B is not equal to register C
     /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) != reg(c)
-    NotEquals = 19
+    NotEquals = 19,
 }
 
 impl TryFrom<u8> for Op {

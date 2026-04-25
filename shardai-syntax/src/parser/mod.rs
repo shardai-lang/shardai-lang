@@ -237,7 +237,10 @@ impl Parser {
         while match_token!(self, TokenType::Or) {
             let right = self.and()?;
 
-            expr = Expr::Or {left: expr.into(), right: right.into()}
+            expr = Expr::Or {
+                left: expr.into(),
+                right: right.into(),
+            }
         }
 
         Ok(expr)
@@ -249,7 +252,10 @@ impl Parser {
         while match_token!(self, TokenType::And) {
             let right = self.equality()?;
 
-            expr = Expr::And {left: expr.into(), right: right.into()}
+            expr = Expr::And {
+                left: expr.into(),
+                right: right.into(),
+            }
         }
 
         Ok(expr)
@@ -283,7 +289,13 @@ impl Parser {
     fn comparison(&mut self) -> Result<Expr, ParseError> {
         let mut expr = self.term()?;
 
-        while match_token!(self, TokenType::Greater, TokenType::GreaterEqual, TokenType::Less, TokenType::LessEqual) {
+        while match_token!(
+            self,
+            TokenType::Greater,
+            TokenType::GreaterEqual,
+            TokenType::Less,
+            TokenType::LessEqual
+        ) {
             let operation = self.previous().clone();
             let right = self.term()?;
 
@@ -300,12 +312,12 @@ impl Parser {
 
                 TokenType::Less => Expr::LessThan {
                     left: expr.into(),
-                    right: right.into()
+                    right: right.into(),
                 },
 
                 TokenType::LessEqual => Expr::LessEqualThan {
                     left: expr.into(),
-                    right: right.into()
+                    right: right.into(),
                 },
 
                 _ => unreachable!(),
@@ -318,12 +330,16 @@ impl Parser {
     fn unary(&mut self) -> Result<Expr, ParseError> {
         if match_token!(self, TokenType::Not) {
             let operand = self.unary()?;
-            return Ok(Expr::Not { operand: operand.into() });
+            return Ok(Expr::Not {
+                operand: operand.into(),
+            });
         }
 
         if match_token!(self, TokenType::Minus) {
             let operand = self.unary()?;
-            return Ok(Expr::Negate { operand: operand.into() });
+            return Ok(Expr::Negate {
+                operand: operand.into(),
+            });
         }
 
         self.primary()

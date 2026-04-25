@@ -384,16 +384,20 @@ impl VM {
     fn values_equal(&self, left: Value, right: Value) -> Result<bool, RuntimeError> {
         match (left, right) {
             (Value::HeapObj(l), Value::HeapObj(r)) => {
-                let l_obj = self.heap.get(l)
+                let l_obj = self
+                    .heap
+                    .get(l)
                     .ok_or(RuntimeError::IllegalOperation("invalid heap index".into()))?;
-                let r_obj = self.heap.get(r)
+                let r_obj = self
+                    .heap
+                    .get(r)
                     .ok_or(RuntimeError::IllegalOperation("invalid heap index".into()))?;
 
                 Ok(l_obj == r_obj)
             }
 
             (Value::HeapObj(_), _) | (_, Value::HeapObj(_)) => Ok(false),
-            _ => Ok(left == right)
+            _ => Ok(left == right),
         }
     }
 }
