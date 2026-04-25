@@ -73,6 +73,38 @@ pub enum Op {
     /// Adds A and B read as an i16 to the program counter if the value in register C is falsy
     /// number(AB) reg(c) -> ip += number(AB) if not reg(c)
     JumpIfFalsy = 11,
+
+    /// Sets register A to the logical not of the value in register B
+    /// reg(a) reg(b) -> reg(a) = not reg(b)
+    LogicalNot = 12,
+
+    /// Sets register A to the negation of the value in register B
+    /// reg(a) reg(b) -> reg(a) = -reg(b)
+    Negate = 13,
+
+    /// Sets register A to if register B is greater than register C
+    /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) > reg(c)
+    GreaterThan = 14,
+
+    /// Sets register A to if register B is greater than or equal to register C
+    /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) >= reg(c)
+    GreaterEqualThan = 15,
+
+    /// Sets register A to if register B is less than register C
+    /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) < reg(c)
+    LessThan = 16,
+
+    /// Sets register A to if register B is less than or equal to register C
+    /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) <= reg(c)
+    LessEqualThan = 17,
+
+    /// Sets register A to if register B is equal to register C
+    /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) == reg(c)
+    Equals = 18,
+
+    /// Sets register A to if register B is not equal to register C
+    /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) != reg(c)
+    NotEquals = 19
 }
 
 impl TryFrom<u8> for Op {
@@ -92,6 +124,14 @@ impl TryFrom<u8> for Op {
             9 => Ok(Op::Jump),
             10 => Ok(Op::JumpIfTruthy),
             11 => Ok(Op::JumpIfFalsy),
+            12 => Ok(Op::LogicalNot),
+            13 => Ok(Op::Negate),
+            14 => Ok(Op::GreaterThan),
+            15 => Ok(Op::GreaterEqualThan),
+            16 => Ok(Op::LessThan),
+            17 => Ok(Op::LessEqualThan),
+            18 => Ok(Op::Equals),
+            19 => Ok(Op::NotEquals),
 
             _ => Err("Unknown opcode"),
         }

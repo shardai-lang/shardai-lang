@@ -55,6 +55,14 @@ impl Debug for Instruction {
             Op::Jump => "JUMP",
             Op::JumpIfTruthy => "JUMPIFTRUTHY",
             Op::JumpIfFalsy => "JUMPIFFALSY",
+            Op::LogicalNot => "LOGICALNOT",
+            Op::Negate => "NEGATE",
+            Op::GreaterThan => "GREATERTHAN",
+            Op::GreaterEqualThan => "GREATEREQUALTHAN",
+            Op::LessThan => "LESSTHAN",
+            Op::LessEqualThan => "LESSEQUALTHAN",
+            Op::Equals => "EQUALS",
+            Op::NotEquals => "NOTEQUALS",
         };
 
         write!(f, "{} {} {} {}", op_name, self.a, self.b, self.c)

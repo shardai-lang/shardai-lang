@@ -51,6 +51,14 @@ impl VM {
                 Op::Jump => self.jump(inst.a, inst.b)?,
                 Op::JumpIfTruthy => self.jump_if_truthy(inst.a, inst.b, inst.c)?,
                 Op::JumpIfFalsy => self.jump_if_falsy(inst.a, inst.b, inst.c)?,
+                Op::LogicalNot => self.logical_not(inst.a, inst.b)?,
+                Op::Negate => self.negate(inst.a, inst.b)?,
+                Op::GreaterThan => self.greater_than(inst.a, inst.b, inst.c)?,
+                Op::GreaterEqualThan => self.greater_equal_than(inst.a, inst.b, inst.c)?,
+                Op::LessThan => self.less_than(inst.a, inst.b, inst.c)?,
+                Op::LessEqualThan => self.less_equal_than(inst.a, inst.b, inst.c)?,
+                Op::Equals => self.equals(inst.a, inst.b, inst.c)?,
+                Op::NotEquals => self.not_equals(inst.a, inst.b, inst.c)?,
 
                 Op::Return => return Ok(self.registers[inst.a as usize]),
                 Op::ReturnVoid => return Ok(Value::Void),
@@ -219,6 +227,119 @@ impl VM {
     }
 
     #[inline]
+    fn logical_not(&mut self, a: u8, b: u8) -> Result<(), RuntimeError> {
+        let value = self.registers[b as usize];
+        self.registers[a as usize] = Value::Bool(!self.is_truthy(&value));
+
+        Ok(())
+    }
+
+    #[inline]
+    fn negate(&mut self, a: u8, b: u8) -> Result<(), RuntimeError> {
+        let value = self.registers[b as usize];
+
+        if let Value::Number(n) = value {
+            self.registers[a as usize] = Value::Number(-n);
+            return Ok(());
+        }
+
+        Err(RuntimeError::InvalidOperation(format!(
+            "cannot negate {}",
+            value
+        )))
+    }
+
+    #[inline]
+    fn greater_than(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
+        let left = self.registers[b as usize];
+        let right = self.registers[c as usize];
+
+        if let Value::Number(l) = left
+            && let Value::Number(r) = right
+        {
+            self.registers[a as usize] = Value::Bool(l > r);
+            return Ok(());
+        }
+
+        Err(RuntimeError::InvalidOperation(format!(
+            "cannot compare {} > {}",
+            left, right
+        )))
+    }
+
+    #[inline]
+    fn greater_equal_than(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
+        let left = self.registers[b as usize];
+        let right = self.registers[c as usize];
+
+        if let Value::Number(l) = left
+            && let Value::Number(r) = right
+        {
+            self.registers[a as usize] = Value::Bool(l >= r);
+            return Ok(());
+        }
+
+        Err(RuntimeError::InvalidOperation(format!(
+            "cannot compare {} >= {}",
+            left, right
+        )))
+    }
+
+    #[inline]
+    fn less_than(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
+        let left = self.registers[b as usize];
+        let right = self.registers[c as usize];
+
+        if let Value::Number(l) = left
+            && let Value::Number(r) = right
+        {
+            self.registers[a as usize] = Value::Bool(l < r);
+            return Ok(());
+        }
+
+        Err(RuntimeError::InvalidOperation(format!(
+            "cannot compare {} < {}",
+            left, right
+        )))
+    }
+
+    #[inline]
+    fn less_equal_than(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
+        let left = self.registers[b as usize];
+        let right = self.registers[c as usize];
+
+        if let Value::Number(l) = left
+            && let Value::Number(r) = right
+        {
+            self.registers[a as usize] = Value::Bool(l <= r);
+            return Ok(());
+        }
+
+        Err(RuntimeError::InvalidOperation(format!(
+            "cannot compare {} <= {}",
+            left, right
+        )))
+    }
+
+    #[inline]
+    fn equals(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
+        let left = self.registers[b as usize];
+        let right = self.registers[c as usize];
+
+        self.registers[a as usize] = Value::Bool(self.values_equal(left, right)?);
+        Ok(())
+    }
+
+    #[inline]
+    fn not_equals(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
+        let left = self.registers[b as usize];
+        let right = self.registers[c as usize];
+
+        self.registers[a as usize] = Value::Bool(self.values_equal(left, right)?);
+        Ok(())
+    }
+
+    #[inline]
     fn jump(&mut self, a: u8, b: u8) -> Result<(), RuntimeError> {
         let offset = i16::from_le_bytes([a, b]);
         self.pc = self
@@ -256,6 +377,23 @@ impl VM {
             Value::Bool(b) if !b => false,
 
             _ => true,
+        }
+    }
+
+    #[inline]
+    fn values_equal(&self, left: Value, right: Value) -> Result<bool, RuntimeError> {
+        match (left, right) {
+            (Value::HeapObj(l), Value::HeapObj(r)) => {
+                let l_obj = self.heap.get(l)
+                    .ok_or(RuntimeError::IllegalOperation("invalid heap index".into()))?;
+                let r_obj = self.heap.get(r)
+                    .ok_or(RuntimeError::IllegalOperation("invalid heap index".into()))?;
+
+                Ok(l_obj == r_obj)
+            }
+
+            (Value::HeapObj(_), _) | (_, Value::HeapObj(_)) => Ok(false),
+            _ => Ok(left == right)
         }
     }
 }

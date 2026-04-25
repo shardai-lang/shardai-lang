@@ -194,8 +194,63 @@ impl Compiler {
             Expr::Subtract { left, right } => self.compile_binary_op(*left, *right, Op::Subtract),
             Expr::Multiply { left, right } => self.compile_binary_op(*left, *right, Op::Multiply),
             Expr::Divide { left, right } => self.compile_binary_op(*left, *right, Op::Divide),
-            Expr::Exponentiation { left, right } => {
-                self.compile_binary_op(*left, *right, Op::Exponentiate)
+            Expr::Exponentiation { left, right } => self.compile_binary_op(*left, *right, Op::Exponentiate),
+            Expr::GreaterThan { left, right } => self.compile_binary_op(*left, *right, Op::GreaterThan),
+            Expr::GreaterEqualThan { left, right } => self.compile_binary_op(*left, *right, Op::GreaterEqualThan),
+            Expr::LessThan { left, right } => self.compile_binary_op(*left, *right, Op::LessThan),
+            Expr::LessEqualThan { left, right } => self.compile_binary_op(*left, *right, Op::LessEqualThan),
+            Expr::Equals { left, right } => self.compile_binary_op(*left, *right, Op::Equals),
+            Expr::NotEquals { left, right } => self.compile_binary_op(*left, *right, Op::NotEquals),
+
+            Expr::Not { operand } => {
+                let source_register = self.compile_expr(*operand)?;
+                let destination_register = self.next_register;
+                self.next_register += 1;
+
+                self.emit(Op::LogicalNot, source_register, destination_register, 0);
+                Ok(destination_register)
+            }
+
+            Expr::Negate { operand } => {
+                let source_register = self.compile_expr(*operand)?;
+                let destination_register = self.next_register;
+                self.next_register += 1;
+
+                self.emit(Op::Negate, source_register, destination_register, 0);
+                Ok(destination_register)
+            }
+
+            Expr::And { left, right } => {
+                let destination_register = self.next_register;
+                self.next_register += 1;
+                let left_register = self.compile_expr(*left)?;
+
+                // if left is falsy then short circuit, move left to destination and jump past right
+                self.emit(Op::Move, destination_register, left_register, 0);
+                let short_circuit = self.emit(Op::JumpIfFalsy, 0, 0, left_register);
+
+                // left was truthy so we evaluate the right and move it to the destination
+                let right_reg = self.compile_expr(*right)?;
+                self.emit(Op::Move, destination_register, right_reg, 0);
+
+                self.patch_jump(short_circuit);
+                Ok(destination_register)
+            }
+
+            Expr::Or { left, right } => {
+                let destination_register = self.next_register;
+                self.next_register += 1;
+                let left_register = self.compile_expr(*left)?;
+
+                self.emit(Op::Move, destination_register, left_register, 0);
+                let short_circuit = self.emit(Op::JumpIfTruthy, 0, 0, left_register);
+
+                let right_register = self.next_register;
+                self.next_register += 1;
+                self.emit(Op::Move, destination_register, right_register, 0);
+
+                self.patch_jump(short_circuit);
+                Ok(destination_register)
             }
 
             _ => unimplemented!()
