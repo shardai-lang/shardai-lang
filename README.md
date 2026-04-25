@@ -13,7 +13,7 @@ Shardai is still heavily in the works. Feel free to check back later!
 ```
 func fizzbuzz() {
     for i = 1, 100 {
-        if i % 3 == 0 && i % 5 == 0 {
+        if i % 3 == 0 and i % 5 == 0 {
             print("FizzBuzz")
         } else if i % 3 == 0 {
             print("Fizz")
