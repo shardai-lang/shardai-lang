@@ -58,6 +58,8 @@ impl Lexer {
         let c = self.advance()?;
         let token = match c {
             ';' => Some(TokenType::Semicolon),
+            '{' => Some(TokenType::LeftBrace),
+            '}' => Some(TokenType::RightBrace),
 
             // Math operators
             '+' => Some(TokenType::Plus),
@@ -65,8 +67,6 @@ impl Lexer {
             '/' => Some(TokenType::Slash),
             '*' => Some(TokenType::Star),
             '^' => Some(TokenType::Carat),
-            '{' => Some(TokenType::LeftBrace),
-            '}' => Some(TokenType::RightBrace),
             '%' => Some(TokenType::Percent),
 
             // Whitespace/special characters
