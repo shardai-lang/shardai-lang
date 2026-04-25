@@ -78,9 +78,7 @@ impl VM {
         let constant = self
             .constants
             .get(b as usize)
-            .ok_or(RuntimeError::IllegalOperation(
-                "invalid constant index".into(),
-            ))?
+            .ok_or(RuntimeError::IllegalOperation("invalid constant index".into()))?
             .clone();
 
         let register_value = if let Constant::String(s) = constant {
@@ -135,10 +133,7 @@ impl VM {
 
                         #[allow(unreachable_patterns)]
                         _ => {
-                            return Err(RuntimeError::InvalidOperation(format!(
-                                "cannot add {} and {}",
-                                l, r
-                            )));
+                            return Err(RuntimeError::InvalidOperation(format!("cannot add {} and {}", l, r)));
                         }
                     }
                 };
@@ -148,10 +143,7 @@ impl VM {
                 Ok(())
             }
 
-            _ => Err(RuntimeError::InvalidOperation(format!(
-                "cannot add {} and {}",
-                left, right
-            ))),
+            _ => Err(RuntimeError::InvalidOperation(format!("cannot add {} and {}", left, right))),
         }
     }
 
@@ -244,10 +236,7 @@ impl VM {
             return Ok(());
         }
 
-        Err(RuntimeError::InvalidOperation(format!(
-            "cannot negate {}",
-            value
-        )))
+        Err(RuntimeError::InvalidOperation(format!("cannot negate {}", value)))
     }
 
     #[inline]
@@ -280,10 +269,7 @@ impl VM {
             return Ok(());
         }
 
-        Err(RuntimeError::InvalidOperation(format!(
-            "cannot compare {} > {}",
-            left, right
-        )))
+        Err(RuntimeError::InvalidOperation(format!("cannot compare {} > {}", left, right)))
     }
 
     #[inline]
@@ -316,10 +302,7 @@ impl VM {
             return Ok(());
         }
 
-        Err(RuntimeError::InvalidOperation(format!(
-            "cannot compare {} < {}",
-            left, right
-        )))
+        Err(RuntimeError::InvalidOperation(format!("cannot compare {} < {}", left, right)))
     }
 
     #[inline]

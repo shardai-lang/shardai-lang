@@ -86,10 +86,7 @@ impl Parser {
 
     fn var_declaration(&mut self) -> Result<Stmt, ParseError> {
         let name = self
-            .consume(
-                TokenType::Identifier,
-                ErrorMessage::ExpectedIdentifier("var"),
-            )?
+            .consume(TokenType::Identifier, ErrorMessage::ExpectedIdentifier("var"))?
             .clone();
 
         let initializer = if match_token!(self, TokenType::Equals) {
@@ -335,16 +332,12 @@ impl Parser {
     fn unary(&mut self) -> Result<Expr, ParseError> {
         if match_token!(self, TokenType::Not) {
             let operand = self.unary()?;
-            return Ok(Expr::Not {
-                operand: operand.into(),
-            });
+            return Ok(Expr::Not { operand: operand.into() });
         }
 
         if match_token!(self, TokenType::Minus) {
             let operand = self.unary()?;
-            return Ok(Expr::Negate {
-                operand: operand.into(),
-            });
+            return Ok(Expr::Negate { operand: operand.into() });
         }
 
         self.primary()
@@ -409,11 +402,7 @@ impl Parser {
         Ok(self.peek().token_type == token_type)
     }
 
-    fn consume(
-        &mut self,
-        token_type: TokenType,
-        message: ErrorMessage,
-    ) -> Result<&Token, ParseError> {
+    fn consume(&mut self, token_type: TokenType, message: ErrorMessage) -> Result<&Token, ParseError> {
         if self.check(token_type)? {
             self.advance()
         } else {

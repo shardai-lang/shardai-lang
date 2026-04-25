@@ -146,9 +146,7 @@ impl Lexer {
         };
 
         if let Some(token_type) = token {
-            let lexeme = self.source[self.tkn_start..self.source_idx]
-                .iter()
-                .collect();
+            let lexeme = self.source[self.tkn_start..self.source_idx].iter().collect();
             let length = self.source_idx - self.tkn_start;
 
             Ok(Some(Token {
@@ -182,9 +180,7 @@ impl Lexer {
             self.consume_digits()?;
         }
 
-        let num_str: String = self.source[self.tkn_start..self.source_idx]
-            .iter()
-            .collect();
+        let num_str: String = self.source[self.tkn_start..self.source_idx].iter().collect();
         num_str.parse::<f64>().map_err(|_| LexError {
             line: self.line,
             message: ErrorMessage::MalformedNumber(num_str),
@@ -202,9 +198,7 @@ impl Lexer {
     fn identifier(&mut self) -> Result<(String, TokenType), LexError> {
         self.consume_letters()?;
 
-        let word = self.source[self.tkn_start..self.source_idx]
-            .iter()
-            .collect();
+        let word = self.source[self.tkn_start..self.source_idx].iter().collect();
         if let Some(kw) = self.keywords.get(&word) {
             Ok((word, kw.clone()))
         } else {
@@ -231,9 +225,7 @@ impl Lexer {
         self.advance()?; // closing quote
 
         // +1 to skip starting quote, -1 to skip closing quote
-        let literal = self.source[self.tkn_start + 1..self.source_idx - 1]
-            .iter()
-            .collect();
+        let literal = self.source[self.tkn_start + 1..self.source_idx - 1].iter().collect();
 
         Ok(literal)
     }

@@ -17,11 +17,7 @@ impl Debug for BytecodeHeader {
         let signature = str::from_utf8(&self.signature).unwrap_or("Invalid UTF8 signature");
 
         write!(f, "Signature: {},", signature)?;
-        write!(
-            f,
-            " Version: {}.{},",
-            self.version_major, self.version_minor
-        )?;
+        write!(f, " Version: {}.{},", self.version_major, self.version_minor)?;
         write!(f, " Constant Count: {}", self.constant_count)?;
         write!(f, " Instruction Count: {}", self.instruction_count)?;
 
