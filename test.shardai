@@ -1,4 +1,8 @@
 var finalString = "";
+const immutable = "hello";
+
+var x = 10;
+const x = x;
 
 if 5 > 10 and true or not false {
     finalString = finalString + "condition true, if branch";
@@ -8,4 +12,4 @@ if 5 > 10 and true or not false {
     finalString = finalString + "condition false, else branch";
 }
 
-return 3 * ((2+5) * 5);
+return x;

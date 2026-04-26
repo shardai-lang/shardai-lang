@@ -13,9 +13,15 @@ use std::collections::HashMap;
 const VERSION_MAJOR: u8 = 0;
 const VERSION_MINOR: u8 = 0;
 
+#[derive(Copy, Clone)]
+enum Local {
+    Mutable(u8),
+    Immutable(u8),
+}
+
 pub struct Compiler {
     next_register: u8, // This sucks really badly since we can't free registers but we'll fix it later
-    locals: HashMap<String, u8>,
+    locals: HashMap<String, Local>,
     constants: Vec<Constant>,
     instructions: Vec<Instruction>,
 }
@@ -59,13 +65,19 @@ impl Compiler {
     }
 
     fn register_local(&mut self, name: String, register: u8) -> Result<(), CompileError> {
-        self.locals.insert(name, register);
+        self.locals.insert(name, Local::Mutable(register));
 
         Ok(())
     }
 
-    fn get_local(&mut self, name: &String) -> Option<u8> {
-        self.locals.get(name).cloned()
+    fn register_local_immutable(&mut self, name: String, register: u8) -> Result<(), CompileError> {
+        self.locals.insert(name, Local::Immutable(register));
+
+        Ok(())
+    }
+
+    fn get_local(&mut self, name: &String) -> Option<Local> {
+        self.locals.get(name).copied()
     }
 
     pub fn compile(&mut self, ast: Vec<Stmt>) -> Result<BytecodeFile, CompileError> {
@@ -101,12 +113,33 @@ impl Compiler {
                 self.register_local(name.lexeme, register)?;
                 Ok(())
             }
-            Stmt::Assign { target, value } => {
-                let target_register = self.compile_expr(target)?;
-                let value_register = self.compile_expr(value)?;
+            Stmt::Const { name, initializer } => {
+                let register = self.next_register;
+                self.next_register += 1;
 
-                self.emit(Op::Move, target_register, value_register, 0);
+                let value_register = self.compile_expr(initializer)?;
+                self.emit(Op::Move, register, value_register, 0);
+
+                self.register_local_immutable(name.lexeme, register)?;
                 Ok(())
+            }
+            Stmt::Assign { target, value } => {
+                if let Expr::Identifier(t) = &target {
+                    let local = self
+                        .get_local(&t.lexeme)
+                        .ok_or(CompileError::UnknownLocal(t.lexeme.clone()))?;
+
+                    if let Local::Mutable(r) = local {
+                        let value_register = self.compile_expr(value)?;
+
+                        self.emit(Op::Move, r, value_register, 0);
+                        Ok(())
+                    } else {
+                        Err(CompileError::ImmutableLocal(t.lexeme.clone()))
+                    }
+                } else {
+                    Err(CompileError::InvalidAssignment)
+                }
             }
             Stmt::Expr(e) => {
                 self.compile_expr(e)?;
@@ -177,9 +210,16 @@ impl Compiler {
                 Ok(dest)
             }
 
-            Expr::Identifier(token) => self
-                .get_local(&token.lexeme)
-                .ok_or(CompileError::UnknownLocal(token.lexeme)),
+            Expr::Identifier(token) => {
+                let local = self
+                    .get_local(&token.lexeme)
+                    .ok_or(CompileError::UnknownLocal(token.lexeme.clone()))?;
+
+                match local {
+                    Local::Immutable(r) => Ok(r),
+                    Local::Mutable(r) => Ok(r),
+                }
+            }
 
             Expr::Add { left, right } => self.compile_binary_op(*left, *right, Op::Add),
             Expr::Subtract { left, right } => self.compile_binary_op(*left, *right, Op::Subtract),

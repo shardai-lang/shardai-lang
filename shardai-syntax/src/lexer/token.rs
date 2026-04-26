@@ -52,5 +52,5 @@ pub enum TokenType {
     Percent,
     LeftParen,
     RightParen,
-    Const
+    Const,
 }
