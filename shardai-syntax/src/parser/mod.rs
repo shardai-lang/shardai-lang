@@ -60,6 +60,8 @@ impl Parser {
     fn statement(&mut self) -> Result<Stmt, ParseError> {
         if match_token!(self, TokenType::Var) {
             return self.var_declaration();
+        } else if match_token!(self, TokenType::Const) {
+            return self.const_declaration();
         } else if match_token!(self, TokenType::Return) {
             return self.return_statement();
         } else if match_token!(self, TokenType::If) {
@@ -93,6 +95,19 @@ impl Parser {
 
         self.consume(TokenType::Semicolon, ErrorMessage::ExpectedChar(';'))?;
         Ok(Stmt::Var { name, initializer })
+    }
+
+    fn const_declaration(&mut self) -> Result<Stmt, ParseError> {
+        let name = self
+            .consume(TokenType::Identifier, ErrorMessage::ExpectedIdentifier("const"))?
+            .clone();
+
+        self.consume(TokenType::Equals, ErrorMessage::ExpectedChar('='))?;
+
+        let initializer = self.expression()?;
+        self.consume(TokenType::Semicolon, ErrorMessage::ExpectedChar(';'))?;
+
+        Ok(Stmt::Const { name, initializer })
     }
 
     fn return_statement(&mut self) -> Result<Stmt, ParseError> {

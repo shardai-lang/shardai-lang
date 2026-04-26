@@ -7,6 +7,8 @@ use std::fmt::{Display, Formatter};
 pub enum CompileError {
     TooManyConstants,
     UnknownLocal(String),
+    ImmutableLocal(String),
+    InvalidAssignment,
 }
 
 impl Display for CompileError {
@@ -14,6 +16,8 @@ impl Display for CompileError {
         match self {
             CompileError::TooManyConstants => write!(f, "Too many constants"),
             CompileError::UnknownLocal(s) => write!(f, "Unknown local {}", s),
+            CompileError::ImmutableLocal(s) => write!(f, "Immutable local {}", s),
+            CompileError::InvalidAssignment => write!(f, "Invalid assignment"),
         }
     }
 }
