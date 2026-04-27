@@ -117,6 +117,21 @@ impl Compiler {
     fn frame_mut(&mut self) -> &mut CompilerFrame {
         self.compiler_frames.last_mut().unwrap()
     }
+
+    fn build_chunk(&self, compiler_frame: &CompilerFrame, arity: u8) -> Chunk {
+        let info = ChunkInfo {
+            arity,
+            instruction_count: compiler_frame.instructions.len() as u16,
+            constant_count: compiler_frame.constants.len() as u16,
+        };
+
+        Chunk {
+            info,
+            instructions: compiler_frame.instructions.clone(),
+            constants: compiler_frame.constants.clone()
+        }
+    }
+
     fn add_constant(&mut self, constant: Constant) -> Result<u8, CompileError> {
         if self.constants.len() >= u8::MAX as usize {
             return Err(CompileError::TooManyConstants);
