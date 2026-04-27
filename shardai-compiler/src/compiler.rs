@@ -80,6 +80,21 @@ struct CompilerFrame {
     instructions: Vec<Instruction>,
 }
 
+impl CompilerFrame {
+    pub fn new() -> Self {
+        Self {
+            locals: HashMap::new(),
+            constants: Vec::new(),
+            instructions: Vec::new()
+        }
+    }
+}
+
+pub struct Compiler {
+    register_allocator: RegisterAllocator,
+    compiler_frames: Vec<CompilerFrame>
+}
+
 
 impl Compiler {
     pub fn new() -> Self {
