@@ -37,8 +37,6 @@ impl Compiler {
             signature: *b"SBC",
             version_major: VERSION_MAJOR,
             version_minor: VERSION_MINOR,
-            constant_count: self.constants.len() as u16,
-            instruction_count: self.instructions.len() as u32,
         }
     }
 
