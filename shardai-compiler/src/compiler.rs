@@ -133,12 +133,13 @@ impl Compiler {
     }
 
     fn add_constant(&mut self, constant: Constant) -> Result<u8, CompileError> {
-        if self.constants.len() >= u8::MAX as usize {
+        let frame = self.frame_mut();
+        if frame.constants.len() >= u8::MAX as usize {
             return Err(CompileError::TooManyConstants);
         }
 
-        self.constants.push(constant);
-        Ok((self.constants.len() - 1) as u8)
+        frame.constants.push(constant);
+        Ok((frame.constants.len() - 1) as u8)
     }
 
     fn emit(&mut self, opcode: Op, a: u8, b: u8, c: u8) -> usize {
