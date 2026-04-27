@@ -9,6 +9,7 @@ use shardai_bytecode::opcodes::*;
 use shardai_syntax::parser::expr::Expr;
 use shardai_syntax::parser::stmt::Stmt;
 use std::collections::HashMap;
+use shardai_bytecode::chunk::{Chunk, ChunkInfo};
 
 const VERSION_MAJOR: u8 = 0;
 const VERSION_MINOR: u8 = 0;
