@@ -294,8 +294,7 @@ impl Compiler {
         match expr {
             Expr::Literal(value) => {
                 let const_idx = self.add_constant(value.into())?;
-                let dest = self.next_register;
-                self.next_register += 1;
+                let dest = self.register_allocator.alloc();
 
                 self.emit(Op::LoadConst, dest, const_idx, 0);
                 Ok(dest)
@@ -328,25 +327,26 @@ impl Compiler {
 
             Expr::Not { operand } => {
                 let source_register = self.compile_expr(*operand)?;
-                let destination_register = self.next_register;
-                self.next_register += 1;
+                let destination_register = self.register_allocator.alloc();
 
                 self.emit(Op::LogicalNot, source_register, destination_register, 0);
+                self.register_allocator.dealloc(source_register);
+
                 Ok(destination_register)
             }
 
             Expr::Negate { operand } => {
                 let source_register = self.compile_expr(*operand)?;
-                let destination_register = self.next_register;
-                self.next_register += 1;
+                let destination_register = self.register_allocator.alloc();
 
                 self.emit(Op::Negate, source_register, destination_register, 0);
+                self.register_allocator.dealloc(source_register);
+
                 Ok(destination_register)
             }
 
             Expr::And { left, right } => {
-                let destination_register = self.next_register;
-                self.next_register += 1;
+                let destination_register = self.register_allocator.alloc();
                 let left_register = self.compile_expr(*left)?;
 
                 // if left is falsy then short circuit, move left to destination and jump past right
@@ -362,8 +362,7 @@ impl Compiler {
             }
 
             Expr::Or { left, right } => {
-                let destination_register = self.next_register;
-                self.next_register += 1;
+                let destination_register = self.register_allocator.alloc();
                 let left_register = self.compile_expr(*left)?;
 
                 self.emit(Op::Move, destination_register, left_register, 0);
