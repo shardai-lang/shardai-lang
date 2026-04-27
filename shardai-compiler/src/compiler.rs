@@ -98,7 +98,7 @@ pub struct Compiler {
 
 impl Compiler {
     pub fn new() -> Self {
-        Self { next_register: 0, locals: HashMap::new(), constants: Vec::new(), instructions: Vec::new() }
+        Self { register_allocator: RegisterAllocator::new(), compiler_frames: vec![CompilerFrame::new(); 1] }
     }
 
     fn build_header(&self) -> BytecodeHeader {
