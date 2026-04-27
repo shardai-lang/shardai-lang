@@ -66,6 +66,8 @@ impl Parser {
             return self.return_statement();
         } else if match_token!(self, TokenType::If) {
             return self.if_statement();
+        } else if match_token!(self, TokenType::Func) {
+            return self.func_declaration()
         }
 
         self.expression_statement()
