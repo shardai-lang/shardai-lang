@@ -285,6 +285,8 @@ impl Compiler {
                 self.patch_jump(short_circuit);
                 Ok(destination_register)
             }
+
+            Expr::Func { params, body } => unimplemented!()
         }
     }
 
