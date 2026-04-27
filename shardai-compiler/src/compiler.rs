@@ -393,9 +393,9 @@ impl Compiler {
 
     fn patch_jump(&mut self, jump_pos: usize) {
         // subtract one since pc will be pointing past jump instruction
-        let offset = (self.instructions.len() - jump_pos - 1) as i16;
+        let offset = (self.frame().instructions.len() - jump_pos - 1) as i16;
         let [a, b] = offset.to_le_bytes();
-        let inst = self.instructions.get_mut(jump_pos).unwrap();
+        let inst = self.frame_mut().instructions.get_mut(jump_pos).unwrap();
 
         inst.a = a;
         inst.b = b;
