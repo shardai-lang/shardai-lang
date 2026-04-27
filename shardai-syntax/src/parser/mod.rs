@@ -199,7 +199,25 @@ impl Parser {
     // while right associative functions call themselves.
     // Left associative is `Add(Add(1,2),3)`, while right associative is `Exp(2,Exp(3,4))`
     fn expression(&mut self) -> Result<Expr, ParseError> {
+        if self.check(TokenType::Func)? {
+            return self.anonymous_func()
+        }
+
         self.or()
+    }
+
+    fn anonymous_func(&mut self) -> Result<Expr, ParseError> {
+        self.consume(TokenType::Func, ErrorMessage::ExpectedIdentifier("func"))?;
+        let params = self.parse_params()?;
+        let mut body = Vec::new();
+
+        self.consume(TokenType::LeftBrace, ErrorMessage::ExpectedChar('{'))?;
+        while !self.check(TokenType::RightBrace)? {
+            body.push(self.statement()?);
+        }
+        self.consume(TokenType::RightBrace, ErrorMessage::ExpectedChar('}'))?;
+
+        Ok(Expr::Func { params, body })
     }
 
     fn exponentiation(&mut self) -> Result<Expr, ParseError> {
