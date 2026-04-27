@@ -64,6 +64,7 @@ impl Lexer {
             '}' => Some(TokenType::RightBrace),
             '(' => Some(TokenType::LeftParen),
             ')' => Some(TokenType::RightParen),
+            ',' => Some(TokenType::Comma),
 
             // Math operators
             '+' => Some(TokenType::Plus),
