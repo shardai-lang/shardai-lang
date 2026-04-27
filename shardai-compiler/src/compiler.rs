@@ -76,6 +76,7 @@ impl RegisterAllocator {
 
 #[derive(Clone)]
 struct CompilerFrame {
+    register_allocator: RegisterAllocator,
     locals: HashMap<String, Local>,
     constants: Vec<Constant>,
     instructions: Vec<Instruction>,
@@ -84,6 +85,7 @@ struct CompilerFrame {
 impl CompilerFrame {
     pub fn new() -> Self {
         Self {
+            register_allocator: RegisterAllocator::new(),
             locals: HashMap::new(),
             constants: Vec::new(),
             instructions: Vec::new()
@@ -92,14 +94,13 @@ impl CompilerFrame {
 }
 
 pub struct Compiler {
-    register_allocator: RegisterAllocator,
     compiler_frames: Vec<CompilerFrame>
 }
 
 
 impl Compiler {
     pub fn new() -> Self {
-        Self { register_allocator: RegisterAllocator::new(), compiler_frames: vec![CompilerFrame::new(); 1] }
+        Self { compiler_frames: vec![CompilerFrame::new(); 1] }
     }
 
     fn build_header(&self) -> BytecodeHeader {
@@ -193,7 +194,7 @@ impl Compiler {
     fn compile_stmt(&mut self, stmt: Stmt) -> Result<(), CompileError> {
         match stmt {
             Stmt::Var { name, initializer } => {
-                let register = self.register_allocator.alloc();
+                let register = self.frame_mut().register_allocator.alloc();
 
                 if let Some(init) = initializer {
                     let value_register = self.compile_expr(init)?;
@@ -205,7 +206,7 @@ impl Compiler {
                 Ok(())
             }
             Stmt::Const { name, initializer } => {
-                let register = self.register_allocator.alloc();
+                let register = self.frame_mut().register_allocator.alloc();
 
                 let value_register = self.compile_expr(initializer)?;
                 self.emit(Op::Move, register, value_register, 0);
@@ -294,7 +295,7 @@ impl Compiler {
         match expr {
             Expr::Literal(value) => {
                 let const_idx = self.add_constant(value.into())?;
-                let dest = self.register_allocator.alloc();
+                let dest = self.frame_mut().register_allocator.alloc();
 
                 self.emit(Op::LoadConst, dest, const_idx, 0);
                 Ok(dest)
@@ -327,26 +328,26 @@ impl Compiler {
 
             Expr::Not { operand } => {
                 let source_register = self.compile_expr(*operand)?;
-                let destination_register = self.register_allocator.alloc();
+                let destination_register = self.frame_mut().register_allocator.alloc();
 
                 self.emit(Op::LogicalNot, source_register, destination_register, 0);
-                self.register_allocator.dealloc(source_register);
+                self.frame_mut().register_allocator.dealloc(source_register);
 
                 Ok(destination_register)
             }
 
             Expr::Negate { operand } => {
                 let source_register = self.compile_expr(*operand)?;
-                let destination_register = self.register_allocator.alloc();
+                let destination_register = self.frame_mut().register_allocator.alloc();
 
                 self.emit(Op::Negate, source_register, destination_register, 0);
-                self.register_allocator.dealloc(source_register);
+                self.frame_mut().register_allocator.dealloc(source_register);
 
                 Ok(destination_register)
             }
 
             Expr::And { left, right } => {
-                let destination_register = self.register_allocator.alloc();
+                let destination_register = self.frame_mut().register_allocator.alloc();
                 let left_register = self.compile_expr(*left)?;
 
                 // if left is falsy then short circuit, move left to destination and jump past right
@@ -362,7 +363,7 @@ impl Compiler {
             }
 
             Expr::Or { left, right } => {
-                let destination_register = self.register_allocator.alloc();
+                let destination_register = self.frame_mut().register_allocator.alloc();
                 let left_register = self.compile_expr(*left)?;
 
                 self.emit(Op::Move, destination_register, left_register, 0);
@@ -382,11 +383,11 @@ impl Compiler {
     fn compile_binary_op(&mut self, left: Expr, right: Expr, op: Op) -> Result<u8, CompileError> {
         let left = self.compile_expr(left)?;
         let right = self.compile_expr(right)?;
-        let dest = self.register_allocator.alloc();
+        let dest = self.frame_mut().register_allocator.alloc();
 
         self.emit(op, dest, left, right);
-        self.register_allocator.dealloc(left);
-        self.register_allocator.dealloc(right);
+        self.frame_mut().register_allocator.dealloc(left);
+        self.frame_mut().register_allocator.dealloc(right);
 
         Ok(dest)
     }
