@@ -173,10 +173,12 @@ impl Compiler {
     pub fn compile(&mut self, ast: Vec<Stmt>) -> Result<BytecodeFile, CompileError> {
         self.compile_ast(ast)?;
 
+        let top_level_frame = self.frame();
+        let top_level = self.build_chunk(top_level_frame, 0);
+
         Ok(BytecodeFile {
             header: self.build_header(),
-            constants: self.constants.clone(),
-            instructions: self.instructions.clone(),
+            top_level
         })
     }
 
