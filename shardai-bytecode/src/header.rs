@@ -32,14 +32,10 @@ impl BytecodeHeader {
         let mut signature = [0u8; 3];
         let mut version_major = [0u8; 1];
         let mut version_minor = [0u8; 1];
-        let mut constant_count_bytes = [0u8; 2]; // one u16
-        let mut instruction_count_bytes = [0u8; 4]; // one u16
 
         reader.read_exact(&mut signature)?;
         reader.read_exact(&mut version_major)?;
         reader.read_exact(&mut version_minor)?;
-        reader.read_exact(&mut constant_count_bytes)?;
-        reader.read_exact(&mut instruction_count_bytes)?;
 
         Ok(Self {
             signature,
