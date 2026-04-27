@@ -159,26 +159,7 @@ impl Parser {
             .consume(TokenType::Identifier, ErrorMessage::ExpectedIdentifier("func"))?
             .clone();
 
-        let mut params = Vec::new();
-        self.consume(TokenType::LeftParen, ErrorMessage::ExpectedChar('('))?;
-
-        if !self.check(TokenType::RightParen)? {
-            loop {
-                params.push(
-                    self
-                        .consume(TokenType::Identifier, ErrorMessage::ExpectedIdentifier("param"))?
-                        .clone()
-                );
-
-                if self.check(TokenType::RightParen)? {
-                    break
-                } else {
-                    self.consume(TokenType::Comma, ErrorMessage::ExpectedChar(','))?;
-                }
-            }
-        }
-
-        self.consume(TokenType::RightParen, ErrorMessage::ExpectedChar(')'))?;
+        let params = self.parse_params()?;
 
         let mut body = Vec::new();
         self.consume(TokenType::LeftBrace, ErrorMessage::ExpectedChar('{'))?;
@@ -186,7 +167,7 @@ impl Parser {
             body.push(self.statement()?);
         }
         self.consume(TokenType::RightBrace, ErrorMessage::ExpectedChar('}'))?;
-        
+
         Ok(Stmt::Func { name, params, body })
     }
 
@@ -373,6 +354,30 @@ impl Parser {
         }
 
         Err(ParseError { token: self.peek().clone(), message: ErrorMessage::ExpectedExpression })
+    }
+
+    fn parse_params(&mut self) -> Result<Vec<Token>, ParseError> {
+        let mut params = Vec::new();
+        self.consume(TokenType::LeftParen, ErrorMessage::ExpectedChar('('))?;
+
+        if !self.check(TokenType::RightParen)? {
+            loop {
+                params.push(
+                    self
+                        .consume(TokenType::Identifier, ErrorMessage::ExpectedIdentifier("param"))?
+                        .clone()
+                );
+
+                if self.check(TokenType::RightParen)? {
+                    break
+                } else {
+                    self.consume(TokenType::Comma, ErrorMessage::ExpectedChar(','))?;
+                }
+            }
+        }
+
+        self.consume(TokenType::RightParen, ErrorMessage::ExpectedChar(')'))?;
+        Ok(params)
     }
 
     // Helper methods
