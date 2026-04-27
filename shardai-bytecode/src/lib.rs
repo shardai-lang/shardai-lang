@@ -3,3 +3,4 @@ pub mod file;
 pub mod header;
 pub mod instruction;
 pub mod opcodes;
+mod chunk;
