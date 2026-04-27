@@ -9,7 +9,7 @@ use crate::instruction::Instruction;
 pub struct ChunkInfo {
     pub arity: u8,
     pub instruction_count: u16,
-    pub constant_count: u32
+    pub constant_count: u16
 }
 
 impl ChunkInfo {
@@ -30,9 +30,9 @@ impl ChunkInfo {
         reader.read_exact(&mut instruction_count_bytes)?;
         let instruction_count = u16::from_le_bytes(instruction_count_bytes);
 
-        let mut constant_count_bytes = [0u8; 4];
+        let mut constant_count_bytes = [0u8; 2];
         reader.read_exact(&mut constant_count_bytes)?;
-        let constant_count = u32::from_le_bytes(constant_count_bytes);
+        let constant_count = u16::from_le_bytes(constant_count_bytes);
 
         Ok(Self { arity, instruction_count, constant_count })
     }
