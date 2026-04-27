@@ -113,6 +113,10 @@ impl Compiler {
     fn frame(&self) -> &CompilerFrame {
         self.compiler_frames.last().unwrap()
     }
+
+    fn frame_mut(&mut self) -> &mut CompilerFrame {
+        self.compiler_frames.last_mut().unwrap()
+    }
     fn add_constant(&mut self, constant: Constant) -> Result<u8, CompileError> {
         if self.constants.len() >= u8::MAX as usize {
             return Err(CompileError::TooManyConstants);
