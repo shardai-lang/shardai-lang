@@ -152,7 +152,8 @@ impl Compiler {
     }
 
     fn register_local(&mut self, name: String, register: u8) -> Result<(), CompileError> {
-        self.locals.insert(name, Local::Mutable(register));
+        let frame = self.frame_mut();
+        frame.locals.insert(name, Local::Mutable(register));
 
         Ok(())
     }
