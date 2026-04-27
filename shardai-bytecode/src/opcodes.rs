@@ -109,6 +109,10 @@ pub enum Op {
     /// Sets register A to the remainder of register B % register C
     /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) % reg(c)
     Modulo = 20,
+    
+    /// Sets the current call stack to the Chunk at constant index AB read as a u16, with an arity of C.
+    /// reg(a) reg(b) reg(c) -> callframe = constants[AB](C)
+    Call = 21,
 }
 
 impl TryFrom<u8> for Op {
@@ -137,6 +141,7 @@ impl TryFrom<u8> for Op {
             18 => Ok(Op::Equals),
             19 => Ok(Op::NotEquals),
             20 => Ok(Op::Modulo),
+            21 => Ok(Op::Call),
 
             _ => Err("Unknown opcode"),
         }
