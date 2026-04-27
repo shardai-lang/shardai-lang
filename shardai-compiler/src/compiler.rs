@@ -10,6 +10,7 @@ use shardai_syntax::parser::expr::Expr;
 use shardai_syntax::parser::stmt::Stmt;
 use std::collections::HashMap;
 use shardai_bytecode::chunk::{Chunk, ChunkInfo};
+use shardai_syntax::lexer::token::Token;
 
 const VERSION_MAJOR: u8 = 0;
 const VERSION_MINOR: u8 = 0;
@@ -100,7 +101,7 @@ pub struct Compiler {
 
 impl Compiler {
     pub fn new() -> Self {
-        Self { compiler_frames: vec![CompilerFrame::new(); 1] }
+        Self { compiler_frames: Vec::new() }
     }
 
     fn build_header(&self) -> BytecodeHeader {
@@ -172,9 +173,10 @@ impl Compiler {
     }
 
     pub fn compile(&mut self, ast: Vec<Stmt>) -> Result<BytecodeFile, CompileError> {
+        self.compiler_frames.push(CompilerFrame::new()); // top level frame
         self.compile_ast(ast)?;
 
-        let top_level_frame = self.frame();
+        let top_level_frame =  self.compiler_frames.first().unwrap();
         let top_level = self.build_chunk(top_level_frame, 0);
 
         Ok(BytecodeFile {
@@ -287,7 +289,17 @@ impl Compiler {
                     }
                 }
             }
-            Stmt::Func { name, params, body } => unimplemented!()
+            Stmt::Func { name, params, body } => {
+                let target_register = self.frame_mut().register_allocator.alloc();
+
+                let chunk = self.compile_func(params, body)?;
+                let const_idx = self.add_constant(Constant::Chunk(chunk))?;
+
+                self.emit(Op::LoadConst, target_register, const_idx, 0);
+                self.register_local_immutable(name.lexeme, target_register)?;
+
+                Ok(())
+            }
         }
     }
 
@@ -376,7 +388,14 @@ impl Compiler {
                 Ok(destination_register)
             }
 
-            Expr::Func { params, body } => unimplemented!()
+            Expr::Func { params, body } => {
+                let chunk = self.compile_func(params, body)?;
+                let const_idx = self.add_constant(Constant::Chunk(chunk))?;
+                let dest = self.frame_mut().register_allocator.alloc();
+
+                self.emit(Op::LoadConst, dest, const_idx, 0);
+                Ok(dest)
+            }
         }
     }
 
@@ -400,5 +419,23 @@ impl Compiler {
 
         inst.a = a;
         inst.b = b;
+    }
+
+    fn compile_func(&mut self, params: Vec<Token>, body: Vec<Stmt>) -> Result<Chunk, CompileError> {
+        self.compiler_frames.push(CompilerFrame::new());
+        let arity = params.len();
+        for param in params {
+            let register = self.frame_mut().register_allocator.alloc();
+            self.register_local(param.lexeme, register)?;
+        }
+
+        for stmt in body {
+            self.compile_stmt(stmt)?;
+        }
+
+        let frame = self.compiler_frames.pop().unwrap();
+        let chunk = self.build_chunk(&frame, arity as u8);
+
+        Ok(chunk)
     }
 }

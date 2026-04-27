@@ -18,8 +18,8 @@ pub struct VM {
 
 impl VM {
     pub fn new(bytecode_file: BytecodeFile) -> Self {
-        let instructions = bytecode_file.instructions;
-        let constants = bytecode_file.constants;
+        let instructions = Vec::new();
+        let constants = Vec::new();
         let registers = vec![Value::Void; 256];
         let heap = Vec::new();
 
@@ -54,6 +54,7 @@ impl VM {
                 Op::Equals => self.equals(inst.a, inst.b, inst.c)?,
                 Op::NotEquals => self.not_equals(inst.a, inst.b, inst.c)?,
                 Op::Modulo => self.modulo(inst.a, inst.b, inst.c)?,
+                Op::Call => unimplemented!(),
 
                 Op::Return => return Ok(self.registers[inst.a as usize]),
                 Op::ReturnVoid => return Ok(Value::Void),
