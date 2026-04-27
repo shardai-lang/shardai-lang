@@ -143,10 +143,11 @@ impl Compiler {
     }
 
     fn emit(&mut self, opcode: Op, a: u8, b: u8, c: u8) -> usize {
+        let frame = self.frame_mut();
         let instr = Instruction { opcode, a, b, c };
-        let instr_pos = self.instructions.len();
+        let instr_pos = frame.instructions.len();
 
-        self.instructions.push(instr);
+        frame.instructions.push(instr);
         instr_pos
     }
 
