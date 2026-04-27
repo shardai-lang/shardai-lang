@@ -382,10 +382,12 @@ impl Compiler {
     fn compile_binary_op(&mut self, left: Expr, right: Expr, op: Op) -> Result<u8, CompileError> {
         let left = self.compile_expr(left)?;
         let right = self.compile_expr(right)?;
-        let dest = self.next_register;
-        self.next_register += 1;
+        let dest = self.register_allocator.alloc();
 
         self.emit(op, dest, left, right);
+        self.register_allocator.dealloc(left);
+        self.register_allocator.dealloc(right);
+
         Ok(dest)
     }
 
