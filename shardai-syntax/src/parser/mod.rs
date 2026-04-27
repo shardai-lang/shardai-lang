@@ -154,6 +154,42 @@ impl Parser {
         Ok(Stmt::If { condition, if_branch, else_branch })
     }
 
+    fn func_declaration(&mut self) -> Result<Stmt, ParseError> {
+        let name = self
+            .consume(TokenType::Identifier, ErrorMessage::ExpectedIdentifier("func"))?
+            .clone();
+
+        let mut params = Vec::new();
+        self.consume(TokenType::LeftParen, ErrorMessage::ExpectedChar('('))?;
+
+        if !self.check(TokenType::RightParen)? {
+            loop {
+                params.push(
+                    self
+                        .consume(TokenType::Identifier, ErrorMessage::ExpectedIdentifier("param"))?
+                        .clone()
+                );
+
+                if self.check(TokenType::RightParen)? {
+                    break
+                } else {
+                    self.consume(TokenType::Comma, ErrorMessage::ExpectedChar(','))?;
+                }
+            }
+        }
+
+        self.consume(TokenType::RightParen, ErrorMessage::ExpectedChar(')'))?;
+
+        let mut body = Vec::new();
+        self.consume(TokenType::LeftBrace, ErrorMessage::ExpectedChar('{'))?;
+        while !self.check(TokenType::RightBrace)? {
+            body.push(self.statement()?);
+        }
+        self.consume(TokenType::RightBrace, ErrorMessage::ExpectedChar('}'))?;
+        
+        Ok(Stmt::Func { name, params, body })
+    }
+
     // Expression parsers
 
     // Highest level parser
