@@ -193,8 +193,7 @@ impl Compiler {
     fn compile_stmt(&mut self, stmt: Stmt) -> Result<(), CompileError> {
         match stmt {
             Stmt::Var { name, initializer } => {
-                let register = self.next_register;
-                self.next_register += 1;
+                let register = self.register_allocator.alloc();
 
                 if let Some(init) = initializer {
                     let value_register = self.compile_expr(init)?;
@@ -206,8 +205,7 @@ impl Compiler {
                 Ok(())
             }
             Stmt::Const { name, initializer } => {
-                let register = self.next_register;
-                self.next_register += 1;
+                let register = self.register_allocator.alloc();
 
                 let value_register = self.compile_expr(initializer)?;
                 self.emit(Op::Move, register, value_register, 0);
