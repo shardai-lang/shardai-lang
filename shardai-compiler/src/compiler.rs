@@ -166,7 +166,8 @@ impl Compiler {
     }
 
     fn get_local(&mut self, name: &String) -> Option<Local> {
-        self.locals.get(name).copied()
+        let frame = self.frame_mut();
+        frame.locals.get(name).copied()
     }
 
     pub fn compile(&mut self, ast: Vec<Stmt>) -> Result<BytecodeFile, CompileError> {
