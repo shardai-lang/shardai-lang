@@ -8,6 +8,10 @@ func myFunc(a, b, c) {
     return a * b + c;
 }
 
+var otherFunc = func(a, b) {
+    return a + b;
+};
+
 if 5 > 10 and true or not false {
     finalString = finalString + "condition true, if branch";
 } else if false == true {
