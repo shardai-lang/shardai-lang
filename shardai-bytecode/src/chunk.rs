@@ -5,6 +5,7 @@ use std::io::{Read, Write};
 use crate::constant::Constant;
 use crate::instruction::Instruction;
 
+#[derive(Clone)]
 pub struct ChunkInfo {
     pub arity: u8,
     pub instruction_count: u16,
@@ -37,6 +38,7 @@ impl ChunkInfo {
     }
 }
 
+#[derive(Clone)]
 pub struct Chunk {
     pub info: ChunkInfo,
     pub instructions: Vec<Instruction>,
