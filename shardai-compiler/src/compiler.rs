@@ -196,6 +196,7 @@ impl Compiler {
                     }
                 }
             }
+            Stmt::Func { name, params, body } => unimplemented!()
         }
     }
 
