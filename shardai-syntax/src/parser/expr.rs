@@ -2,6 +2,7 @@
 
 use crate::lexer::token::Token;
 use crate::literal_value::LiteralValue;
+use crate::parser::stmt::Stmt;
 
 #[derive(Debug)]
 pub enum Expr {
