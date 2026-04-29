@@ -264,10 +264,10 @@ impl VM {
 
     #[inline]
     fn negate(&mut self, a: u8, b: u8) -> Result<(), RuntimeError> {
-        let value = self.registers[b as usize];
+        let value = self.get_register(b);
 
         if let Value::Number(n) = value {
-            self.registers[a as usize] = Value::Number(-n);
+            self.set_register(a, Value::Number(-n));
             return Ok(());
         }
 
