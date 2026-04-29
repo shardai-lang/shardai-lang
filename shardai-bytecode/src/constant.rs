@@ -1,5 +1,6 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
+use crate::chunk::Chunk;
 use shardai_syntax::literal_value::LiteralValue;
 use std::fmt::{Debug, Formatter};
 use std::io;
@@ -7,6 +8,7 @@ use std::io::{ErrorKind, Read, Write};
 
 #[derive(Clone)]
 pub enum Constant {
+    Chunk(Chunk),
     String(String),
     Number(f64),
     Bool(bool),
@@ -17,10 +19,15 @@ pub const STRING_TAG: u8 = 0x00;
 pub const NUMBER_TAG: u8 = 0x01;
 pub const BOOL_TAG: u8 = 0x02;
 pub const NIL_TAG: u8 = 0x03;
+pub const CHUNK_TAG: u8 = 0x04;
 
 impl Constant {
     pub fn write(&self, writer: &mut impl Write) -> io::Result<()> {
         match self {
+            Constant::Chunk(c) => {
+                writer.write_all(&[CHUNK_TAG])?;
+                c.write(writer)?
+            }
             Constant::String(s) => {
                 writer.write_all(&[STRING_TAG])?; // 1 byte tag
                 writer.write_all(&(s.len() as u32).to_le_bytes())?; // 4 byte length
@@ -80,6 +87,7 @@ impl Constant {
                 }
             }
 
+            CHUNK_TAG => Ok(Constant::Chunk(Chunk::read(reader)?)),
             NIL_TAG => Ok(Constant::Nil),
             _ => Err(io::Error::new(ErrorKind::InvalidData, "Unknown constant tag")),
         }
@@ -100,6 +108,7 @@ impl From<LiteralValue> for Constant {
 impl Debug for Constant {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
+            Constant::Chunk(_) => write!(f, "Constant(chunk))"),
             Constant::String(s) => write!(f, "Constant(\"{}\")", s),
             Constant::Number(n) => write!(f, "Constant({})", n),
             Constant::Bool(b) => write!(f, "Constant({})", b),

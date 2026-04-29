@@ -31,6 +31,7 @@ impl Lexer {
             ("or".into(), TokenType::Or),
             ("not".into(), TokenType::Not),
             ("const".into(), TokenType::Const),
+            ("func".into(), TokenType::Func),
         ]);
 
         Self { source: source.chars().collect(), keywords, line: 0, source_idx: 0, tkn_start: 0 }
@@ -63,6 +64,7 @@ impl Lexer {
             '}' => Some(TokenType::RightBrace),
             '(' => Some(TokenType::LeftParen),
             ')' => Some(TokenType::RightParen),
+            ',' => Some(TokenType::Comma),
 
             // Math operators
             '+' => Some(TokenType::Plus),

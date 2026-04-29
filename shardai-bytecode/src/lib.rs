@@ -1,3 +1,4 @@
+pub mod chunk;
 pub mod constant;
 pub mod file;
 pub mod header;

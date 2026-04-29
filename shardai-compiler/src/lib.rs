@@ -1,5 +1,6 @@
 pub mod compiler;
 mod error;
+mod register_allocator;
 
 use crate::compiler::Compiler;
 use crate::error::CompileError;

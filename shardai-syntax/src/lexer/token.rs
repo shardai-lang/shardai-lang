@@ -53,4 +53,6 @@ pub enum TokenType {
     LeftParen,
     RightParen,
     Const,
+    Func,
+    Comma,
 }

@@ -19,6 +19,7 @@ impl From<Constant> for Value {
             Constant::Bool(b) => Value::Bool(b),
             Constant::Nil => Value::Nil,
             Constant::String(_) => panic!("String is incompatible with Value, put it in the heap"),
+            Constant::Chunk(_) => panic!("Chunk is incompatible with Value, put it in the heap"),
         }
     }
 }

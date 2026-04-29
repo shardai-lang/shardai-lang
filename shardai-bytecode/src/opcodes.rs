@@ -25,7 +25,7 @@ Update instruction.rs if you add a new instruction
 */
 
 #[repr(u8)]
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum Op {
     /// Loads constant at B into register at A<br>
     /// reg(a) const(b) -> reg(a) = const(b)
@@ -109,6 +109,10 @@ pub enum Op {
     /// Sets register A to the remainder of register B % register C
     /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) % reg(c)
     Modulo = 20,
+
+    /// Calls the chunk at B with C number of params and stores the value at A.
+    /// reg(a) reg(b) reg(c0 -> reg(a) = reg(b)(0 to c)
+    Call = 21,
 }
 
 impl TryFrom<u8> for Op {
@@ -137,6 +141,7 @@ impl TryFrom<u8> for Op {
             18 => Ok(Op::Equals),
             19 => Ok(Op::NotEquals),
             20 => Ok(Op::Modulo),
+            21 => Ok(Op::Call),
 
             _ => Err("Unknown opcode"),
         }

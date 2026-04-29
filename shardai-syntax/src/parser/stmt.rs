@@ -11,4 +11,5 @@ pub enum Stmt {
     Assign { target: Expr, value: Expr },
     Return { return_value: Option<Expr> },
     If { condition: Expr, if_branch: Vec<Stmt>, else_branch: Option<Vec<Stmt>> },
+    Func { name: Token, params: Vec<Token>, body: Vec<Stmt> },
 }

@@ -66,6 +66,8 @@ impl Parser {
             return self.return_statement();
         } else if match_token!(self, TokenType::If) {
             return self.if_statement();
+        } else if match_token!(self, TokenType::Func) {
+            return self.func_declaration();
         }
 
         self.expression_statement()
@@ -154,6 +156,23 @@ impl Parser {
         Ok(Stmt::If { condition, if_branch, else_branch })
     }
 
+    fn func_declaration(&mut self) -> Result<Stmt, ParseError> {
+        let name = self
+            .consume(TokenType::Identifier, ErrorMessage::ExpectedIdentifier("func"))?
+            .clone();
+
+        let params = self.parse_params()?;
+
+        let mut body = Vec::new();
+        self.consume(TokenType::LeftBrace, ErrorMessage::ExpectedChar('{'))?;
+        while !self.check(TokenType::RightBrace)? {
+            body.push(self.statement()?);
+        }
+        self.consume(TokenType::RightBrace, ErrorMessage::ExpectedChar('}'))?;
+
+        Ok(Stmt::Func { name, params, body })
+    }
+
     // Expression parsers
 
     // Highest level parser
@@ -163,7 +182,25 @@ impl Parser {
     // while right associative functions call themselves.
     // Left associative is `Add(Add(1,2),3)`, while right associative is `Exp(2,Exp(3,4))`
     fn expression(&mut self) -> Result<Expr, ParseError> {
+        if self.check(TokenType::Func)? {
+            return self.anonymous_func();
+        }
+
         self.or()
+    }
+
+    fn anonymous_func(&mut self) -> Result<Expr, ParseError> {
+        self.consume(TokenType::Func, ErrorMessage::ExpectedIdentifier("func"))?;
+        let params = self.parse_params()?;
+        let mut body = Vec::new();
+
+        self.consume(TokenType::LeftBrace, ErrorMessage::ExpectedChar('{'))?;
+        while !self.check(TokenType::RightBrace)? {
+            body.push(self.statement()?);
+        }
+        self.consume(TokenType::RightBrace, ErrorMessage::ExpectedChar('}'))?;
+
+        Ok(Expr::Func { params, body })
     }
 
     fn exponentiation(&mut self) -> Result<Expr, ParseError> {
@@ -295,7 +332,18 @@ impl Parser {
             return Ok(Expr::Negate { operand: operand.into() });
         }
 
-        self.primary()
+        self.call()
+    }
+
+    fn call(&mut self) -> Result<Expr, ParseError> {
+        let mut expr = self.primary()?;
+
+        while self.check(TokenType::LeftParen)? {
+            let args = self.parse_args()?;
+            expr = Expr::Call { callee: expr.into(), args }
+        }
+
+        Ok(expr)
     }
 
     fn primary(&mut self) -> Result<Expr, ParseError> {
@@ -319,6 +367,49 @@ impl Parser {
         }
 
         Err(ParseError { token: self.peek().clone(), message: ErrorMessage::ExpectedExpression })
+    }
+
+    fn parse_params(&mut self) -> Result<Vec<Token>, ParseError> {
+        let mut params = Vec::new();
+        self.consume(TokenType::LeftParen, ErrorMessage::ExpectedChar('('))?;
+
+        if !self.check(TokenType::RightParen)? {
+            loop {
+                params.push(
+                    self.consume(TokenType::Identifier, ErrorMessage::ExpectedIdentifier("param"))?
+                        .clone(),
+                );
+
+                if self.check(TokenType::RightParen)? {
+                    break;
+                } else {
+                    self.consume(TokenType::Comma, ErrorMessage::ExpectedChar(','))?;
+                }
+            }
+        }
+
+        self.consume(TokenType::RightParen, ErrorMessage::ExpectedChar(')'))?;
+        Ok(params)
+    }
+
+    fn parse_args(&mut self) -> Result<Vec<Expr>, ParseError> {
+        let mut args = Vec::new();
+        self.consume(TokenType::LeftParen, ErrorMessage::ExpectedChar('('))?;
+
+        if !self.check(TokenType::RightParen)? {
+            loop {
+                args.push(self.expression()?);
+
+                if self.check(TokenType::RightParen)? {
+                    break;
+                } else {
+                    self.consume(TokenType::Comma, ErrorMessage::ExpectedChar(','))?;
+                }
+            }
+        }
+
+        self.consume(TokenType::RightParen, ErrorMessage::ExpectedChar(')'))?;
+        Ok(args)
     }
 
     // Helper methods

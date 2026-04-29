@@ -8,22 +8,54 @@ use shardai_bytecode::file::BytecodeFile;
 use shardai_bytecode::instruction::Instruction;
 use shardai_bytecode::opcodes::Op;
 
-pub struct VM {
+pub struct CallFrame {
+    register_offset: usize,
     instructions: Vec<Instruction>,
-    registers: Vec<Value>,
     constants: Vec<Constant>,
+    ip: usize,
+}
+
+pub struct VM {
+    call_stack: Vec<CallFrame>,
+    registers: Vec<Value>,
     heap: Vec<HeapObj>,
-    pc: usize,
+    returned: bool,
 }
 
 impl VM {
     pub fn new(bytecode_file: BytecodeFile) -> Self {
-        let instructions = bytecode_file.instructions;
-        let constants = bytecode_file.constants;
         let registers = vec![Value::Void; 256];
-        let heap = Vec::new();
 
-        Self { instructions, registers, constants, heap, pc: 0 }
+        let top_level = bytecode_file.top_level;
+        let top_frame = CallFrame {
+            register_offset: 0,
+            instructions: top_level.instructions,
+            constants: top_level.constants,
+            ip: 0,
+        };
+
+        Self { call_stack: vec![top_frame], registers, heap: Vec::new(), returned: false }
+    }
+
+    #[inline]
+    pub fn frame(&self) -> &CallFrame {
+        self.call_stack.last().unwrap()
+    }
+
+    #[inline]
+    pub fn frame_mut(&mut self) -> &mut CallFrame {
+        self.call_stack.last_mut().unwrap()
+    }
+
+    #[inline]
+    pub fn get_register(&self, idx: u8) -> Value {
+        self.registers[self.frame().register_offset + idx as usize]
+    }
+
+    #[inline]
+    pub fn set_register(&mut self, idx: u8, val: Value) {
+        let register_offset = self.frame().register_offset;
+        self.registers[register_offset + idx as usize] = val
     }
 
     pub fn heap_get(&mut self, heap_idx: usize) -> Option<&HeapObj> {
@@ -31,8 +63,17 @@ impl VM {
     }
 
     pub fn run(&mut self) -> Result<Value, RuntimeError> {
-        while let Some(i) = self.instructions.get(self.pc) {
-            let inst = *i;
+        loop {
+            let inst = {
+                let frame = self.frame_mut();
+                let i = frame
+                    .instructions
+                    .get(frame.ip)
+                    .ok_or(RuntimeError::IllegalOperation("pc out of bounds".into()))?;
+
+                frame.ip += 1;
+                *i
+            };
 
             match inst.opcode {
                 Op::LoadConst => self.load_const(inst.a, inst.b)?,
@@ -54,56 +95,68 @@ impl VM {
                 Op::Equals => self.equals(inst.a, inst.b, inst.c)?,
                 Op::NotEquals => self.not_equals(inst.a, inst.b, inst.c)?,
                 Op::Modulo => self.modulo(inst.a, inst.b, inst.c)?,
+                Op::Call => self.call(inst.a, inst.b, inst.c)?,
 
-                Op::Return => return Ok(self.registers[inst.a as usize]),
-                Op::ReturnVoid => return Ok(Value::Void),
+                Op::Return => self.r#return(inst.a)?,
+                Op::ReturnVoid => self.return_void()?,
             }
 
-            self.pc += 1;
+            if self.returned {
+                return Ok(self.registers[0]);
+            }
         }
-
-        Ok(Value::Void)
     }
 
     // Opcode handlers
 
     #[inline]
     fn load_const(&mut self, a: u8, b: u8) -> Result<(), RuntimeError> {
-        let constant = self
+        let frame = self.frame_mut();
+
+        let constant = frame
             .constants
             .get(b as usize)
             .ok_or(RuntimeError::IllegalOperation("invalid constant index".into()))?
             .clone();
 
-        let register_value = if let Constant::String(s) = constant {
-            self.heap.push(HeapObj::String(s));
+        let register_value = match constant {
+            Constant::String(s) => {
+                let idx = self.heap.len();
+                self.heap.push(HeapObj::String(s));
 
-            Value::HeapObj(self.heap.len() - 1)
-        } else {
-            Value::from(constant)
+                Value::HeapObj(idx)
+            }
+            Constant::Chunk(c) => {
+                let idx = self.heap.len();
+                self.heap.push(HeapObj::Chunk(c));
+
+                Value::HeapObj(idx)
+            }
+
+            _ => Value::from(constant),
         };
 
-        self.registers[a as usize] = register_value;
+        self.set_register(a, register_value);
 
         Ok(())
     }
 
     #[inline]
     fn r#move(&mut self, a: u8, b: u8) -> Result<(), RuntimeError> {
-        let right = self.registers[b as usize];
-        self.registers[a as usize] = right;
+        let right = self.get_register(b);
+        self.set_register(a, right);
 
         Ok(())
     }
 
     #[inline]
     fn add(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let left = self.registers[b as usize];
-        let right = self.registers[c as usize];
+        let left = self.get_register(b);
+        let right = self.get_register(c);
 
         match (left, right) {
             (Value::Number(l), Value::Number(r)) => {
-                self.registers[a as usize] = Value::Number(l + r);
+                self.set_register(a, Value::Number(l + r));
                 Ok(())
             }
             (Value::HeapObj(l_idx), Value::HeapObj(r_idx)) => {
@@ -133,8 +186,9 @@ impl VM {
                     }
                 };
 
+                let idx = self.heap.len();
                 self.heap.push(HeapObj::String(concatenated));
-                self.registers[a as usize] = Value::HeapObj(self.heap.len() - 1);
+                self.set_register(a, Value::HeapObj(idx));
                 Ok(())
             }
 
@@ -144,13 +198,13 @@ impl VM {
 
     #[inline]
     fn subtract(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let left = self.registers[b as usize];
-        let right = self.registers[c as usize];
+        let left = self.get_register(b);
+        let right = self.get_register(c);
 
         if let Value::Number(l) = left
             && let Value::Number(r) = right
         {
-            self.registers[a as usize] = Value::Number(l - r);
+            self.set_register(a, Value::Number(l - r));
             return Ok(());
         }
 
@@ -159,13 +213,13 @@ impl VM {
 
     #[inline]
     fn multiply(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let left = self.registers[b as usize];
-        let right = self.registers[c as usize];
+        let left = self.get_register(b);
+        let right = self.get_register(c);
 
         if let Value::Number(l) = left
             && let Value::Number(r) = right
         {
-            self.registers[a as usize] = Value::Number(l * r);
+            self.set_register(a, Value::Number(l * r));
             return Ok(());
         }
 
@@ -174,13 +228,13 @@ impl VM {
 
     #[inline]
     fn divide(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let left = self.registers[b as usize];
-        let right = self.registers[c as usize];
+        let left = self.get_register(b);
+        let right = self.get_register(c);
 
         if let Value::Number(l) = left
             && let Value::Number(r) = right
         {
-            self.registers[a as usize] = Value::Number(l / r);
+            self.set_register(a, Value::Number(l / r));
             return Ok(());
         }
 
@@ -189,13 +243,13 @@ impl VM {
 
     #[inline]
     fn exponentiate(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let left = self.registers[b as usize];
-        let right = self.registers[c as usize];
+        let left = self.get_register(b);
+        let right = self.get_register(c);
 
         if let Value::Number(l) = left
             && let Value::Number(r) = right
         {
-            self.registers[a as usize] = Value::Number(l.powf(r));
+            self.set_register(a, Value::Number(l.powf(r)));
             return Ok(());
         }
 
@@ -204,18 +258,18 @@ impl VM {
 
     #[inline]
     fn logical_not(&mut self, a: u8, b: u8) -> Result<(), RuntimeError> {
-        let value = self.registers[b as usize];
-        self.registers[a as usize] = Value::Bool(!self.is_truthy(&value));
+        let value = self.get_register(b);
+        self.set_register(a, Value::Bool(!self.is_truthy(&value)));
 
         Ok(())
     }
 
     #[inline]
     fn negate(&mut self, a: u8, b: u8) -> Result<(), RuntimeError> {
-        let value = self.registers[b as usize];
+        let value = self.get_register(b);
 
         if let Value::Number(n) = value {
-            self.registers[a as usize] = Value::Number(-n);
+            self.set_register(a, Value::Number(-n));
             return Ok(());
         }
 
@@ -224,13 +278,13 @@ impl VM {
 
     #[inline]
     fn modulo(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let left = self.registers[b as usize];
-        let right = self.registers[c as usize];
+        let left = self.get_register(b);
+        let right = self.get_register(c);
 
         if let Value::Number(l) = left
             && let Value::Number(r) = right
         {
-            self.registers[a as usize] = Value::Number(l.rem_euclid(r));
+            self.set_register(a, Value::Number(l.rem_euclid(r)));
             return Ok(());
         }
 
@@ -239,13 +293,13 @@ impl VM {
 
     #[inline]
     fn greater_than(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let left = self.registers[b as usize];
-        let right = self.registers[c as usize];
+        let left = self.get_register(b);
+        let right = self.get_register(c);
 
         if let Value::Number(l) = left
             && let Value::Number(r) = right
         {
-            self.registers[a as usize] = Value::Bool(l > r);
+            self.set_register(a, Value::Bool(l > r));
             return Ok(());
         }
 
@@ -254,13 +308,13 @@ impl VM {
 
     #[inline]
     fn greater_equal_than(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let left = self.registers[b as usize];
-        let right = self.registers[c as usize];
+        let left = self.get_register(b);
+        let right = self.get_register(c);
 
         if let Value::Number(l) = left
             && let Value::Number(r) = right
         {
-            self.registers[a as usize] = Value::Bool(l >= r);
+            self.set_register(a, Value::Bool(l >= r));
             return Ok(());
         }
 
@@ -269,13 +323,13 @@ impl VM {
 
     #[inline]
     fn less_than(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let left = self.registers[b as usize];
-        let right = self.registers[c as usize];
+        let left = self.get_register(b);
+        let right = self.get_register(c);
 
         if let Value::Number(l) = left
             && let Value::Number(r) = right
         {
-            self.registers[a as usize] = Value::Bool(l < r);
+            self.set_register(a, Value::Bool(l < r));
             return Ok(());
         }
 
@@ -284,13 +338,13 @@ impl VM {
 
     #[inline]
     fn less_equal_than(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let left = self.registers[b as usize];
-        let right = self.registers[c as usize];
+        let left = self.get_register(b);
+        let right = self.get_register(c);
 
         if let Value::Number(l) = left
             && let Value::Number(r) = right
         {
-            self.registers[a as usize] = Value::Bool(l <= r);
+            self.set_register(a, Value::Bool(l <= r));
             return Ok(());
         }
 
@@ -299,27 +353,28 @@ impl VM {
 
     #[inline]
     fn equals(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let left = self.registers[b as usize];
-        let right = self.registers[c as usize];
+        let left = self.get_register(b);
+        let right = self.get_register(c);
 
-        self.registers[a as usize] = Value::Bool(self.values_equal(left, right)?);
+        self.set_register(a, Value::Bool(self.values_equal(left, right)?));
         Ok(())
     }
 
     #[inline]
     fn not_equals(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let left = self.registers[b as usize];
-        let right = self.registers[c as usize];
+        let left = self.get_register(b);
+        let right = self.get_register(c);
 
-        self.registers[a as usize] = Value::Bool(self.values_equal(left, right)?);
+        self.set_register(a, Value::Bool(!self.values_equal(left, right)?));
         Ok(())
     }
 
     #[inline]
     fn jump(&mut self, a: u8, b: u8) -> Result<(), RuntimeError> {
+        let frame = self.frame_mut();
         let offset = i16::from_le_bytes([a, b]);
-        self.pc = self
-            .pc
+        frame.ip = frame
+            .ip
             .checked_add_signed(offset as isize)
             .ok_or(RuntimeError::IllegalOperation("jump out of bounds".into()))?;
 
@@ -328,7 +383,7 @@ impl VM {
 
     #[inline]
     fn jump_if_truthy(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let value = self.registers[c as usize];
+        let value = self.get_register(c);
         if self.is_truthy(&value) {
             self.jump(a, b)?
         }
@@ -338,9 +393,69 @@ impl VM {
 
     #[inline]
     fn jump_if_falsy(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let value = self.registers[c as usize];
+        let value = self.get_register(c);
         if !self.is_truthy(&value) {
             self.jump(a, b)?
+        }
+
+        Ok(())
+    }
+
+    #[inline]
+    fn call(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
+        let frame = self.frame();
+        let chunk = self.get_register(b);
+
+        if let Value::HeapObj(idx) = chunk {
+            match &self.heap[idx] {
+                HeapObj::Chunk(chk) => {
+                    let chk = chk.clone();
+                    if chk.info.arity != c {
+                        return Err(RuntimeError::IllegalOperation("incorrect arity".into()));
+                    }
+
+                    println!("{:#?}", b);
+                    println!("{:#?}", chk.instructions);
+                    println!("{:#?}", chk.constants);
+
+                    self.call_stack.push(CallFrame {
+                        register_offset: frame.register_offset + a as usize + 1,
+                        instructions: chk.instructions,
+                        constants: chk.constants,
+                        ip: 0,
+                    })
+                }
+
+                _ => return Err(RuntimeError::IllegalOperation("can't call a non-chunk".into())),
+            }
+        }
+
+        Ok(())
+    }
+
+    #[inline]
+    fn r#return(&mut self, a: u8) -> Result<(), RuntimeError> {
+        let return_val = self.registers[self.frame().register_offset + a as usize];
+        let frame = self.call_stack.pop().unwrap();
+
+        if self.call_stack.is_empty() {
+            self.registers[0] = return_val;
+            self.returned = true;
+        } else {
+            self.registers[frame.register_offset - 1] = return_val;
+        }
+
+        Ok(())
+    }
+
+    #[inline]
+    fn return_void(&mut self) -> Result<(), RuntimeError> {
+        let frame = self.call_stack.pop().unwrap();
+
+        if self.call_stack.is_empty() {
+            self.returned = true;
+        } else {
+            self.registers[frame.register_offset - 1] = Value::Void;
         }
 
         Ok(())

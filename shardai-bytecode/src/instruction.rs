@@ -64,6 +64,7 @@ impl Debug for Instruction {
             Op::Equals => "EQUALS",
             Op::NotEquals => "NOTEQUALS",
             Op::Modulo => "MODULO",
+            Op::Call => "CALL",
         };
 
         write!(f, "{} {} {} {}", op_name, self.a, self.b, self.c)
