@@ -74,10 +74,17 @@ impl Compiler {
             constant_count: compiler_frame.constants.len() as u16,
         };
 
+        let mut instructions = compiler_frame.instructions.clone();
+        let constants = compiler_frame.constants.clone();
+
+        if !instructions.last().is_some() || instructions.last().unwrap().opcode != Op::Return {
+            instructions.push(Instruction { opcode: Op::ReturnVoid, a: 0, b: 0, c: 0 });
+        }
+
         Chunk {
             info,
-            instructions: compiler_frame.instructions.clone(),
-            constants: compiler_frame.constants.clone()
+            instructions,
+            constants
         }
     }
 
