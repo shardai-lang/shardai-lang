@@ -8,10 +8,16 @@ use shardai_bytecode::file::BytecodeFile;
 use shardai_bytecode::instruction::Instruction;
 use shardai_bytecode::opcodes::Op;
 
-pub struct VM {
+struct CallFrame {
+    register_offset: usize,
     instructions: Vec<Instruction>,
-    registers: Vec<Value>,
     constants: Vec<Constant>,
+    ip: usize,
+}
+
+pub struct VM {
+    call_stack: Vec<CallFrame>,
+    registers: Vec<Value>,
     heap: Vec<HeapObj>,
     pc: usize,
 }
