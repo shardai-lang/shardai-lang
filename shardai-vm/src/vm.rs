@@ -34,9 +34,28 @@ impl VM {
             ip: 0
         };
 
-        Self { instructions, registers, constants, heap, pc: 0 }
         Self { call_stack: vec![top_frame], registers, heap: Vec::new(), returned: false }
     }
+
+    #[inline]
+    pub fn frame(&self) -> &CallFrame {
+        self.call_stack.last().unwrap()
+    }
+
+    #[inline]
+    pub fn frame_mut(&mut self) -> &mut CallFrame {
+        self.call_stack.last_mut().unwrap()
+    }
+
+    #[inline]
+    pub fn get_register(&self, idx: u8) -> Value {
+        self.registers[self.frame().register_offset + idx as usize]
+    }
+
+    #[inline]
+    pub fn set_register(&mut self, idx: u8, val: Value) {
+        let register_offset = self.frame().register_offset;
+        self.registers[register_offset + idx as usize] = val
     }
 
     pub fn heap_get(&mut self, heap_idx: usize) -> Option<&HeapObj> {
