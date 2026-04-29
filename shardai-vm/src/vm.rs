@@ -109,21 +109,32 @@ impl VM {
 
     #[inline]
     fn load_const(&mut self, a: u8, b: u8) -> Result<(), RuntimeError> {
-        let constant = self
+        let frame = self.frame_mut();
+
+        let constant = frame
             .constants
             .get(b as usize)
             .ok_or(RuntimeError::IllegalOperation("invalid constant index".into()))?
             .clone();
+        
+        let register_value = match constant {
+            Constant::String(s) => {
+                let idx = self.heap.len();
+                self.heap.push(HeapObj::String(s));
 
-        let register_value = if let Constant::String(s) = constant {
-            self.heap.push(HeapObj::String(s));
+                Value::HeapObj(idx)
+            }
+            Constant::Chunk(c) => {
+                let idx = self.heap.len();
+                self.heap.push(HeapObj::Chunk(c));
 
-            Value::HeapObj(self.heap.len() - 1)
-        } else {
-            Value::from(constant)
+                Value::HeapObj(idx)
+            }
+            
+            _ => Value::from(constant)
         };
 
-        self.registers[a as usize] = register_value;
+        self.set_register(a, register_value);
 
         Ok(())
     }
