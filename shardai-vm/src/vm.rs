@@ -24,12 +24,19 @@ pub struct VM {
 
 impl VM {
     pub fn new(bytecode_file: BytecodeFile) -> Self {
-        let instructions = Vec::new();
-        let constants = Vec::new();
         let registers = vec![Value::Void; 256];
-        let heap = Vec::new();
+
+        let top_level = bytecode_file.top_level;
+        let top_frame = CallFrame {
+            register_offset: 0,
+            instructions: top_level.instructions,
+            constants: top_level.constants,
+            ip: 0
+        };
 
         Self { instructions, registers, constants, heap, pc: 0 }
+        Self { call_stack: vec![top_frame], registers, heap: Vec::new(), returned: false }
+    }
     }
 
     pub fn heap_get(&mut self, heap_idx: usize) -> Option<&HeapObj> {
