@@ -14,7 +14,7 @@ impl PartialEq for HeapObj {
             (HeapObj::String(s1), HeapObj::String(s2)) if s1 == s2 => true,
 
             // TODO: check if they are stored at same index in heap
-            (HeapObj::Chunk(c1), HeapObj::Chunk(c2)) => false,
+            (HeapObj::Chunk(_c1), HeapObj::Chunk(_c2)) => false,
 
             _ => false
         }

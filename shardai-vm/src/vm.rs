@@ -8,7 +8,7 @@ use shardai_bytecode::file::BytecodeFile;
 use shardai_bytecode::instruction::Instruction;
 use shardai_bytecode::opcodes::Op;
 
-struct CallFrame {
+pub struct CallFrame {
     register_offset: usize,
     instructions: Vec<Instruction>,
     constants: Vec<Constant>,

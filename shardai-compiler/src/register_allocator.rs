@@ -49,6 +49,7 @@ impl RegisterAllocator {
         self.next_register = old;
     }
 
+    #[allow(unused)]
     pub fn frame_size(&self) -> u8 {
         self.next_register
     }

@@ -45,6 +45,11 @@ pub struct Compiler {
     compiler_frames: Vec<CompilerFrame>
 }
 
+impl Default for Compiler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl Compiler {
     pub fn new() -> Self {
@@ -77,7 +82,7 @@ impl Compiler {
         let mut instructions = compiler_frame.instructions.clone();
         let constants = compiler_frame.constants.clone();
 
-        if !instructions.last().is_some() || instructions.last().unwrap().opcode != Op::Return {
+        if instructions.last().is_none() || instructions.last().unwrap().opcode != Op::Return {
             instructions.push(Instruction { opcode: Op::ReturnVoid, a: 0, b: 0, c: 0 });
         }
 
