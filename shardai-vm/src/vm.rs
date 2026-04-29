@@ -391,7 +391,7 @@ impl VM {
 
     #[inline]
     fn jump_if_falsy(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let value = self.registers[c as usize];
+        let value = self.get_register(c);
         if !self.is_truthy(&value) {
             self.jump(a, b)?
         }
