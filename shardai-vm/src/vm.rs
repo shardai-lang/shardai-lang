@@ -99,7 +99,9 @@ impl VM {
                 Op::ReturnVoid => return Ok(Value::Void),
             }
 
-            self.pc += 1;
+            if self.returned {
+                return Ok(self.registers[0]);
+            }
         }
     }
 
