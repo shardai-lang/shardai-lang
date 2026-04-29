@@ -364,6 +364,21 @@ impl Compiler {
                 self.emit(Op::LoadConst, dest, const_idx, 0);
                 Ok(dest)
             }
+
+            Expr::Call { callee, args } => {
+                let callee_local = self.compile_expr(*callee)?;
+                let arity = args.len();
+                let dest = self.frame_mut().register_allocator.alloc();
+
+                for (i, arg) in args.into_iter().enumerate() {
+                    let reg = self.compile_expr(arg)?;
+                    self.emit(Op::Move, dest + 1 + i as u8, reg,0);
+                }
+
+                self.emit(Op::Call, dest, callee_local, arity as u8);
+                self.frame_mut().register_allocator.dealloc(callee_local);
+                Ok(dest)
+            }
         }
     }
 
