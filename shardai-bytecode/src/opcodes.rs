@@ -25,7 +25,7 @@ Update instruction.rs if you add a new instruction
 */
 
 #[repr(u8)]
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum Op {
     /// Loads constant at B into register at A<br>
     /// reg(a) const(b) -> reg(a) = const(b)
