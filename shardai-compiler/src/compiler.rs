@@ -211,6 +211,7 @@ impl Compiler {
                 match else_branch {
                     // `if` only
                     None => {
+                        self.frame_mut().register_allocator.push_scope();
                         let cond_jump_pos = self.emit(Op::JumpIfFalsy, 0, 0, condition_register);
 
                         for stmt in if_branch {
@@ -218,12 +219,14 @@ impl Compiler {
                         }
 
                         self.patch_jump(cond_jump_pos);
+                        self.frame_mut().register_allocator.pop_scope();
 
                         Ok(())
                     }
 
                     // `if` and `else`
                     Some(else_branch) => {
+                        self.frame_mut().register_allocator.push_scope();
                         let cond_jump_pos = self.emit(Op::JumpIfFalsy, 0, 0, condition_register);
 
                         for stmt in if_branch {
@@ -234,12 +237,15 @@ impl Compiler {
                         let end_jump_pos = self.emit(Op::Jump, 0, 0, 0);
 
                         self.patch_jump(cond_jump_pos);
+                        self.frame_mut().register_allocator.pop_scope();
 
+                        self.frame_mut().register_allocator.push_scope();
                         for stmt in else_branch {
                             self.compile_stmt(stmt)?;
                         }
 
                         self.patch_jump(end_jump_pos);
+                        self.frame_mut().register_allocator.pop_scope();
 
                         Ok(())
                     }
