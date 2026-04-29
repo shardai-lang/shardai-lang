@@ -19,7 +19,7 @@ pub struct VM {
     call_stack: Vec<CallFrame>,
     registers: Vec<Value>,
     heap: Vec<HeapObj>,
-    pc: usize,
+    returned: bool
 }
 
 impl VM {
