@@ -394,6 +394,24 @@ impl Compiler {
         Ok(dest)
     }
 
+    // Only deallocates if the register isn't a local (aka, is a temporary)
+    fn safe_dealloc(&mut self, register: u8) {
+        let frame = self.frame();
+        let is_local = frame
+            .locals
+            .values()
+            .any(|l| match l {
+                Local::Mutable(l) if register == *l => true,
+                Local::Immutable(l) if register == *l => true,
+
+                _ => false
+            });
+
+        if !is_local {
+            self.frame_mut().register_allocator.dealloc(register)
+        }
+    }
+
     fn patch_jump(&mut self, jump_pos: usize) {
         // subtract one since pc will be pointing past jump instruction
         let offset = (self.frame().instructions.len() - jump_pos - 1) as i16;
