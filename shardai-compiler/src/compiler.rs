@@ -304,7 +304,7 @@ impl Compiler {
                 let source_register = self.compile_expr(*operand)?;
                 let destination_register = self.frame_mut().register_allocator.alloc();
 
-                self.emit(Op::LogicalNot, source_register, destination_register, 0);
+                self.emit(Op::LogicalNot, destination_register, source_register, 0);
                 self.frame_mut().register_allocator.dealloc(source_register);
 
                 Ok(destination_register)
@@ -314,7 +314,7 @@ impl Compiler {
                 let source_register = self.compile_expr(*operand)?;
                 let destination_register = self.frame_mut().register_allocator.alloc();
 
-                self.emit(Op::Negate, source_register, destination_register, 0);
+                self.emit(Op::Negate, destination_register, source_register, 0);
                 self.frame_mut().register_allocator.dealloc(source_register);
 
                 Ok(destination_register)
