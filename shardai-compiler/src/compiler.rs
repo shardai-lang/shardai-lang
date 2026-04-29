@@ -253,13 +253,12 @@ impl Compiler {
             }
             Stmt::Func { name, params, body } => {
                 let target_register = self.frame_mut().register_allocator.alloc();
+                self.register_local_immutable(name.lexeme, target_register)?;
 
                 let chunk = self.compile_func(params, body)?;
                 let const_idx = self.add_constant(Constant::Chunk(chunk))?;
 
                 self.emit(Op::LoadConst, target_register, const_idx, 0);
-                self.register_local_immutable(name.lexeme, target_register)?;
-
                 Ok(())
             }
         }

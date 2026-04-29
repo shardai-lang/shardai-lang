@@ -1,5 +1,6 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
+use shardai_bytecode::chunk::{Chunk, ChunkInfo};
 use shardai_bytecode::constant::Constant;
 use shardai_bytecode::file::BytecodeFile;
 use shardai_bytecode::header::BytecodeHeader;
@@ -11,11 +12,16 @@ pub fn build(instructions: Vec<Instruction>, constants: Vec<Constant>) -> Byteco
             signature: *b"SBC",
             version_major: 255,
             version_minor: 255,
-            constant_count: constants.len() as u16,
-            instruction_count: instructions.len() as u32,
         },
 
-        constants,
-        instructions,
+        top_level: Chunk {
+            info: ChunkInfo {
+                arity: 0,
+                instruction_count: instructions.len() as u16,
+                constant_count: constants.len() as u16,
+            },
+            instructions,
+            constants,
+        },
     }
 }
