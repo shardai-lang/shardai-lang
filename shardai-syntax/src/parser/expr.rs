@@ -26,5 +26,6 @@ pub enum Expr {
     Negate { operand: Box<Expr> },
     Modulo { left: Box<Expr>, right: Box<Expr> },
     Group { expr: Box<Expr> },
-    Func { params: Vec<Token>, body: Vec<Stmt> }
+    Func { params: Vec<Token>, body: Vec<Stmt> },
+    Call { callee: Box<Expr>, args: Vec<Expr> }
 }
