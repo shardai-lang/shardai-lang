@@ -141,8 +141,8 @@ impl VM {
 
     #[inline]
     fn r#move(&mut self, a: u8, b: u8) -> Result<(), RuntimeError> {
-        let right = self.registers[b as usize];
-        self.registers[a as usize] = right;
+        let right = self.get_register(b);
+        self.set_register(a, right);
 
         Ok(())
     }
