@@ -156,6 +156,7 @@ impl Compiler {
                     let value_register = self.compile_expr(init)?;
 
                     self.emit(Op::Move, register, value_register, 0);
+                    self.frame_mut().register_allocator.dealloc(value_register);
                 }
 
                 self.register_local(name.lexeme, register)?;
@@ -197,6 +198,7 @@ impl Compiler {
                 if let Some(v) = return_value {
                     let return_value_register = self.compile_expr(v)?;
                     self.emit(Op::Return, return_value_register, 0, 0);
+                    self.frame_mut().register_allocator.dealloc(return_value_register);
                     Ok(())
                 } else {
                     self.emit(Op::ReturnVoid, 0, 0, 0);
@@ -325,6 +327,9 @@ impl Compiler {
                 self.emit(Op::Move, destination_register, right_reg, 0);
 
                 self.patch_jump(short_circuit);
+
+                self.frame_mut().register_allocator.dealloc(left_register);
+                self.frame_mut().register_allocator.dealloc(right_reg);
                 Ok(destination_register)
             }
 
@@ -339,6 +344,9 @@ impl Compiler {
                 self.emit(Op::Move, destination_register, right_register, 0);
 
                 self.patch_jump(short_circuit);
+
+                self.frame_mut().register_allocator.dealloc(left_register);
+                self.frame_mut().register_allocator.dealloc(right_register);
                 Ok(destination_register)
             }
 
