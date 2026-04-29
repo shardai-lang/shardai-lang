@@ -400,6 +400,66 @@ impl VM {
     }
 
     #[inline]
+    fn call(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
+        let frame = self.frame();
+        let chunk = self.get_register(b);
+
+        if let Value::HeapObj(idx) = chunk {
+            match &self.heap[idx] {
+                HeapObj::Chunk(chk) => {
+                    let chk = chk.clone();
+                    if chk.info.arity != c {
+                        return Err(RuntimeError::IllegalOperation("incorrect arity".into()));
+                    }
+
+                    println!("{:#?}", b);
+                    println!("{:#?}", chk.instructions);
+                    println!("{:#?}", chk.constants);
+
+                    self.call_stack.push(CallFrame {
+                        register_offset: frame.register_offset + a as usize + 1,
+                        instructions: chk.instructions,
+                        constants: chk.constants,
+                        ip: 0,
+                    })
+                }
+
+                _ => return Err(RuntimeError::IllegalOperation("can't call a non-chunk".into()))
+            }
+        }
+
+        Ok(())
+    }
+
+    #[inline]
+    fn r#return(&mut self, a: u8) -> Result<(), RuntimeError> {
+        let return_val = self.registers[self.frame().register_offset + a as usize];
+        let frame = self.call_stack.pop().unwrap();
+
+        if self.call_stack.is_empty() {
+            self.registers[0] = return_val;
+            self.returned = true;
+        } else {
+            self.registers[frame.register_offset - 1] = return_val;
+        }
+
+        Ok(())
+    }
+
+    #[inline]
+    fn return_void(&mut self) -> Result<(), RuntimeError> {
+        let frame = self.call_stack.pop().unwrap();
+
+        if self.call_stack.is_empty() {
+            self.returned = true;
+        } else {
+            self.registers[frame.register_offset - 1] = Value::Void;
+        }
+
+        Ok(())
+    }
+
+    #[inline]
     fn is_truthy(&self, value: &Value) -> bool {
         match value {
             Value::Nil | Value::Void => false,
