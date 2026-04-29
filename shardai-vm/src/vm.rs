@@ -63,8 +63,15 @@ impl VM {
     }
 
     pub fn run(&mut self) -> Result<Value, RuntimeError> {
-        while let Some(i) = self.instructions.get(self.pc) {
-            let inst = *i;
+        loop {
+            let inst = {
+                let frame = self.frame_mut();
+                let i = frame.instructions.get(frame.ip)
+                    .ok_or(RuntimeError::IllegalOperation("pc out of bounds".into()))?;
+
+                frame.ip += 1;
+                *i
+            };
 
             match inst.opcode {
                 Op::LoadConst => self.load_const(inst.a, inst.b)?,
@@ -94,8 +101,6 @@ impl VM {
 
             self.pc += 1;
         }
-
-        Ok(Value::Void)
     }
 
     // Opcode handlers
