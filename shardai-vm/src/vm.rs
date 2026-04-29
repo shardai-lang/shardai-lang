@@ -369,9 +369,10 @@ impl VM {
 
     #[inline]
     fn jump(&mut self, a: u8, b: u8) -> Result<(), RuntimeError> {
+        let frame = self.frame_mut();
         let offset = i16::from_le_bytes([a, b]);
-        self.pc = self
-            .pc
+        frame.ip = frame
+            .ip
             .checked_add_signed(offset as isize)
             .ok_or(RuntimeError::IllegalOperation("jump out of bounds".into()))?;
 
