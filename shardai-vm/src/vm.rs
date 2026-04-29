@@ -241,13 +241,13 @@ impl VM {
 
     #[inline]
     fn exponentiate(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let left = self.registers[b as usize];
-        let right = self.registers[c as usize];
+        let left = self.get_register(b);
+        let right = self.get_register(c);
 
         if let Value::Number(l) = left
             && let Value::Number(r) = right
         {
-            self.registers[a as usize] = Value::Number(l.powf(r));
+            self.set_register(a, Value::Number(l.powf(r)));
             return Ok(());
         }
 
