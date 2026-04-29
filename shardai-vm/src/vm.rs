@@ -256,8 +256,8 @@ impl VM {
 
     #[inline]
     fn logical_not(&mut self, a: u8, b: u8) -> Result<(), RuntimeError> {
-        let value = self.registers[b as usize];
-        self.registers[a as usize] = Value::Bool(!self.is_truthy(&value));
+        let value = self.get_register(b);
+        self.set_register(a, Value::Bool(!self.is_truthy(&value)));
 
         Ok(())
     }
