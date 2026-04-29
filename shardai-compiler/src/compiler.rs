@@ -388,8 +388,8 @@ impl Compiler {
         let dest = self.frame_mut().register_allocator.alloc();
 
         self.emit(op, dest, left, right);
-        self.frame_mut().register_allocator.dealloc(left);
-        self.frame_mut().register_allocator.dealloc(right);
+        self.safe_dealloc(left);
+        self.safe_dealloc(right);
 
         Ok(dest)
     }
