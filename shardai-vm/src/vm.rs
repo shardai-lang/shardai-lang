@@ -93,10 +93,10 @@ impl VM {
                 Op::Equals => self.equals(inst.a, inst.b, inst.c)?,
                 Op::NotEquals => self.not_equals(inst.a, inst.b, inst.c)?,
                 Op::Modulo => self.modulo(inst.a, inst.b, inst.c)?,
-                Op::Call => unimplemented!(),
+                Op::Call => self.call(inst.a, inst.b, inst.c)?,
 
-                Op::Return => return Ok(self.registers[inst.a as usize]),
-                Op::ReturnVoid => return Ok(Value::Void),
+                Op::Return => self.r#return(inst.a)?,
+                Op::ReturnVoid => self.return_void()?,
             }
 
             if self.returned {
