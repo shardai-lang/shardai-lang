@@ -1,10 +1,10 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
+use crate::chunk::Chunk;
 use shardai_syntax::literal_value::LiteralValue;
 use std::fmt::{Debug, Formatter};
 use std::io;
 use std::io::{ErrorKind, Read, Write};
-use crate::chunk::Chunk;
 
 #[derive(Clone)]
 pub enum Constant {

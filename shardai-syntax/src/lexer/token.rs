@@ -54,5 +54,5 @@ pub enum TokenType {
     RightParen,
     Const,
     Func,
-    Comma
+    Comma,
 }

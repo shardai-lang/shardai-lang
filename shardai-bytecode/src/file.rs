@@ -1,14 +1,14 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
+use crate::chunk::Chunk;
 use crate::header::BytecodeHeader;
 use std::io;
 use std::io::{Read, Write};
-use crate::chunk::Chunk;
 
 #[derive(Debug)]
 pub struct BytecodeFile {
     pub header: BytecodeHeader,
-    pub top_level: Chunk
+    pub top_level: Chunk,
 }
 
 impl BytecodeFile {

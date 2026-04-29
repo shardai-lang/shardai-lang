@@ -8,11 +8,7 @@ use shardai_bytecode::instruction::Instruction;
 
 pub fn build(instructions: Vec<Instruction>, constants: Vec<Constant>) -> BytecodeFile {
     BytecodeFile {
-        header: BytecodeHeader {
-            signature: *b"SBC",
-            version_major: 255,
-            version_minor: 255,
-        },
+        header: BytecodeHeader { signature: *b"SBC", version_major: 255, version_minor: 255 },
 
         top_level: Chunk {
             info: ChunkInfo {

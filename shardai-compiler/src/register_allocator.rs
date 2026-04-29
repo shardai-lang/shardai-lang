@@ -4,16 +4,12 @@
 pub struct RegisterAllocator {
     next_register: u8,
     freed_registers: Vec<u8>,
-    scopes: Vec<u8>
+    scopes: Vec<u8>,
 }
 
 impl RegisterAllocator {
     pub fn new() -> Self {
-        Self {
-            next_register: 0,
-            freed_registers: Vec::new(),
-            scopes: Vec::new(),
-        }
+        Self { next_register: 0, freed_registers: Vec::new(), scopes: Vec::new() }
     }
 
     pub fn alloc(&mut self) -> u8 {
@@ -21,7 +17,9 @@ impl RegisterAllocator {
             reg
         } else {
             let reg = self.next_register;
-            self.next_register = self.next_register.checked_add(1)
+            self.next_register = self
+                .next_register
+                .checked_add(1)
                 .expect("register overflow");
 
             reg
@@ -42,8 +40,7 @@ impl RegisterAllocator {
     }
 
     pub fn pop_scope(&mut self) {
-        let old = self.scopes.pop()
-            .expect("no scope to pop");
+        let old = self.scopes.pop().expect("no scope to pop");
 
         self.freed_registers.retain(|r| *r < old);
         self.next_register = old;

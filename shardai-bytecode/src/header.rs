@@ -7,7 +7,7 @@ use std::io::{Read, Write};
 pub struct BytecodeHeader {
     pub signature: [u8; 3], // "SBC" (Shardai bytecode)
     pub version_major: u8,
-    pub version_minor: u8
+    pub version_minor: u8,
 }
 
 impl Debug for BytecodeHeader {
@@ -40,7 +40,7 @@ impl BytecodeHeader {
         Ok(Self {
             signature,
             version_major: u8::from_le_bytes(version_major),
-            version_minor: u8::from_le_bytes(version_minor)
+            version_minor: u8::from_le_bytes(version_minor),
         })
     }
 }

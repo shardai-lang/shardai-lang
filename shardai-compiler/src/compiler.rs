@@ -1,17 +1,17 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
 use crate::error::CompileError;
+use crate::register_allocator::RegisterAllocator;
+use shardai_bytecode::chunk::{Chunk, ChunkInfo};
 use shardai_bytecode::constant::Constant;
 use shardai_bytecode::file::BytecodeFile;
 use shardai_bytecode::header::BytecodeHeader;
 use shardai_bytecode::instruction::Instruction;
 use shardai_bytecode::opcodes::*;
+use shardai_syntax::lexer::token::Token;
 use shardai_syntax::parser::expr::Expr;
 use shardai_syntax::parser::stmt::Stmt;
 use std::collections::HashMap;
-use shardai_bytecode::chunk::{Chunk, ChunkInfo};
-use shardai_syntax::lexer::token::Token;
-use crate::register_allocator::RegisterAllocator;
 
 const VERSION_MAJOR: u8 = 0;
 const VERSION_MINOR: u8 = 0;
@@ -36,13 +36,13 @@ impl CompilerFrame {
             register_allocator: RegisterAllocator::new(),
             locals: HashMap::new(),
             constants: Vec::new(),
-            instructions: Vec::new()
+            instructions: Vec::new(),
         }
     }
 }
 
 pub struct Compiler {
-    compiler_frames: Vec<CompilerFrame>
+    compiler_frames: Vec<CompilerFrame>,
 }
 
 impl Default for Compiler {
@@ -57,11 +57,7 @@ impl Compiler {
     }
 
     fn build_header(&self) -> BytecodeHeader {
-        BytecodeHeader {
-            signature: *b"SBC",
-            version_major: VERSION_MAJOR,
-            version_minor: VERSION_MINOR,
-        }
+        BytecodeHeader { signature: *b"SBC", version_major: VERSION_MAJOR, version_minor: VERSION_MINOR }
     }
 
     fn frame(&self) -> &CompilerFrame {
@@ -86,11 +82,7 @@ impl Compiler {
             instructions.push(Instruction { opcode: Op::ReturnVoid, a: 0, b: 0, c: 0 });
         }
 
-        Chunk {
-            info,
-            instructions,
-            constants
-        }
+        Chunk { info, instructions, constants }
     }
 
     fn add_constant(&mut self, constant: Constant) -> Result<u8, CompileError> {
@@ -135,13 +127,10 @@ impl Compiler {
         self.compiler_frames.push(CompilerFrame::new()); // top level frame
         self.compile_ast(ast)?;
 
-        let top_level_frame =  self.compiler_frames.first().unwrap();
+        let top_level_frame = self.compiler_frames.first().unwrap();
         let top_level = self.build_chunk(top_level_frame, 0);
 
-        Ok(BytecodeFile {
-            header: self.build_header(),
-            top_level
-        })
+        Ok(BytecodeFile { header: self.build_header(), top_level })
     }
 
     fn compile_ast(&mut self, ast: Vec<Stmt>) -> Result<(), CompileError> {
@@ -203,7 +192,9 @@ impl Compiler {
                 if let Some(v) = return_value {
                     let return_value_register = self.compile_expr(v)?;
                     self.emit(Op::Return, return_value_register, 0, 0);
-                    self.frame_mut().register_allocator.dealloc(return_value_register);
+                    self.frame_mut()
+                        .register_allocator
+                        .dealloc(return_value_register);
                     Ok(())
                 } else {
                     self.emit(Op::ReturnVoid, 0, 0, 0);
@@ -376,7 +367,7 @@ impl Compiler {
 
                 for (i, arg) in args.into_iter().enumerate() {
                     let reg = self.compile_expr(arg)?;
-                    self.emit(Op::Move, dest + 1 + i as u8, reg,0);
+                    self.emit(Op::Move, dest + 1 + i as u8, reg, 0);
                 }
 
                 self.emit(Op::Call, dest, callee_local, arity as u8);
@@ -401,15 +392,12 @@ impl Compiler {
     // Only deallocates if the register isn't a local (aka, is a temporary)
     fn safe_dealloc(&mut self, register: u8) {
         let frame = self.frame();
-        let is_local = frame
-            .locals
-            .values()
-            .any(|l| match l {
-                Local::Mutable(l) if register == *l => true,
-                Local::Immutable(l) if register == *l => true,
+        let is_local = frame.locals.values().any(|l| match l {
+            Local::Mutable(l) if register == *l => true,
+            Local::Immutable(l) if register == *l => true,
 
-                _ => false
-            });
+            _ => false,
+        });
 
         if !is_local {
             self.frame_mut().register_allocator.dealloc(register)

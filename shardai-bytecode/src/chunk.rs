@@ -1,15 +1,15 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
-use std::io;
-use std::io::{Read, Write};
 use crate::constant::Constant;
 use crate::instruction::Instruction;
+use std::io;
+use std::io::{Read, Write};
 
 #[derive(Clone, Debug)]
 pub struct ChunkInfo {
     pub arity: u8,
     pub instruction_count: u16,
-    pub constant_count: u16
+    pub constant_count: u16,
 }
 
 impl ChunkInfo {

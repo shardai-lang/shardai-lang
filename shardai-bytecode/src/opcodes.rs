@@ -109,7 +109,7 @@ pub enum Op {
     /// Sets register A to the remainder of register B % register C
     /// reg(a) reg(b) reg(c) -> reg(a) = reg(b) % reg(c)
     Modulo = 20,
-    
+
     /// Calls the chunk at B with C number of params and stores the value at A.
     /// reg(a) reg(b) reg(c0 -> reg(a) = reg(b)(0 to c)
     Call = 21,

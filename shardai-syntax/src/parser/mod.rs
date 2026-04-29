@@ -67,7 +67,7 @@ impl Parser {
         } else if match_token!(self, TokenType::If) {
             return self.if_statement();
         } else if match_token!(self, TokenType::Func) {
-            return self.func_declaration()
+            return self.func_declaration();
         }
 
         self.expression_statement()
@@ -183,7 +183,7 @@ impl Parser {
     // Left associative is `Add(Add(1,2),3)`, while right associative is `Exp(2,Exp(3,4))`
     fn expression(&mut self) -> Result<Expr, ParseError> {
         if self.check(TokenType::Func)? {
-            return self.anonymous_func()
+            return self.anonymous_func();
         }
 
         self.or()
@@ -376,13 +376,12 @@ impl Parser {
         if !self.check(TokenType::RightParen)? {
             loop {
                 params.push(
-                    self
-                        .consume(TokenType::Identifier, ErrorMessage::ExpectedIdentifier("param"))?
-                        .clone()
+                    self.consume(TokenType::Identifier, ErrorMessage::ExpectedIdentifier("param"))?
+                        .clone(),
                 );
 
                 if self.check(TokenType::RightParen)? {
-                    break
+                    break;
                 } else {
                     self.consume(TokenType::Comma, ErrorMessage::ExpectedChar(','))?;
                 }
@@ -402,7 +401,7 @@ impl Parser {
                 args.push(self.expression()?);
 
                 if self.check(TokenType::RightParen)? {
-                    break
+                    break;
                 } else {
                     self.consume(TokenType::Comma, ErrorMessage::ExpectedChar(','))?;
                 }

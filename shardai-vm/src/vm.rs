@@ -19,7 +19,7 @@ pub struct VM {
     call_stack: Vec<CallFrame>,
     registers: Vec<Value>,
     heap: Vec<HeapObj>,
-    returned: bool
+    returned: bool,
 }
 
 impl VM {
@@ -31,7 +31,7 @@ impl VM {
             register_offset: 0,
             instructions: top_level.instructions,
             constants: top_level.constants,
-            ip: 0
+            ip: 0,
         };
 
         Self { call_stack: vec![top_frame], registers, heap: Vec::new(), returned: false }
@@ -66,7 +66,9 @@ impl VM {
         loop {
             let inst = {
                 let frame = self.frame_mut();
-                let i = frame.instructions.get(frame.ip)
+                let i = frame
+                    .instructions
+                    .get(frame.ip)
                     .ok_or(RuntimeError::IllegalOperation("pc out of bounds".into()))?;
 
                 frame.ip += 1;
@@ -116,7 +118,7 @@ impl VM {
             .get(b as usize)
             .ok_or(RuntimeError::IllegalOperation("invalid constant index".into()))?
             .clone();
-        
+
         let register_value = match constant {
             Constant::String(s) => {
                 let idx = self.heap.len();
@@ -130,8 +132,8 @@ impl VM {
 
                 Value::HeapObj(idx)
             }
-            
-            _ => Value::from(constant)
+
+            _ => Value::from(constant),
         };
 
         self.set_register(a, register_value);
@@ -312,7 +314,7 @@ impl VM {
         if let Value::Number(l) = left
             && let Value::Number(r) = right
         {
-            self.set_register(a,  Value::Bool(l >= r));
+            self.set_register(a, Value::Bool(l >= r));
             return Ok(());
         }
 
@@ -424,7 +426,7 @@ impl VM {
                     })
                 }
 
-                _ => return Err(RuntimeError::IllegalOperation("can't call a non-chunk".into()))
+                _ => return Err(RuntimeError::IllegalOperation("can't call a non-chunk".into())),
             }
         }
 

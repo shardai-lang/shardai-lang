@@ -1,11 +1,11 @@
 // Copyright 2026 wyteroze. Licensed under the Apache License, Version 2.0.
 
-use std::fmt::{Debug, Display, Formatter};
 use shardai_bytecode::chunk::Chunk;
+use std::fmt::{Debug, Display, Formatter};
 
 pub enum HeapObj {
     String(String),
-    Chunk(Chunk)
+    Chunk(Chunk),
 }
 
 impl PartialEq for HeapObj {
@@ -16,7 +16,7 @@ impl PartialEq for HeapObj {
             // TODO: check if they are stored at same index in heap
             (HeapObj::Chunk(_c1), HeapObj::Chunk(_c2)) => false,
 
-            _ => false
+            _ => false,
         }
     }
 }
@@ -25,7 +25,7 @@ impl Debug for HeapObj {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             HeapObj::String(_) => write!(f, "string"),
-            HeapObj::Chunk(_) => write!(f, "chunk")
+            HeapObj::Chunk(_) => write!(f, "chunk"),
         }
     }
 }
@@ -34,7 +34,7 @@ impl Display for HeapObj {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             HeapObj::String(s) => write!(f, "{}", s),
-            HeapObj::Chunk(_) => write!(f, "chunk")
+            HeapObj::Chunk(_) => write!(f, "chunk"),
         }
     }
 }
