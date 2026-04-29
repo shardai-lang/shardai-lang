@@ -149,12 +149,12 @@ impl VM {
 
     #[inline]
     fn add(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let left = self.registers[b as usize];
-        let right = self.registers[c as usize];
+        let left = self.get_register(b);
+        let right = self.get_register(c);
 
         match (left, right) {
             (Value::Number(l), Value::Number(r)) => {
-                self.registers[a as usize] = Value::Number(l + r);
+                self.set_register(a, Value::Number(l + r));
                 Ok(())
             }
             (Value::HeapObj(l_idx), Value::HeapObj(r_idx)) => {
@@ -184,8 +184,9 @@ impl VM {
                     }
                 };
 
+                let idx = self.heap.len();
                 self.heap.push(HeapObj::String(concatenated));
-                self.registers[a as usize] = Value::HeapObj(self.heap.len() - 1);
+                self.set_register(a, Value::HeapObj(idx));
                 Ok(())
             }
 
