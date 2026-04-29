@@ -360,10 +360,10 @@ impl VM {
 
     #[inline]
     fn not_equals(&mut self, a: u8, b: u8, c: u8) -> Result<(), RuntimeError> {
-        let left = self.registers[b as usize];
-        let right = self.registers[c as usize];
+        let left = self.get_register(b);
+        let right = self.get_register(c);
 
-        self.registers[a as usize] = Value::Bool(self.values_equal(left, right)?);
+        self.set_register(a, Value::Bool(!self.values_equal(left, right)?));
         Ok(())
     }
 
