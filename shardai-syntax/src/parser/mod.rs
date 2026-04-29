@@ -332,7 +332,18 @@ impl Parser {
             return Ok(Expr::Negate { operand: operand.into() });
         }
 
-        self.primary()
+        self.call()
+    }
+
+    fn call(&mut self) -> Result<Expr, ParseError> {
+        let mut expr = self.primary()?;
+
+        while self.check(TokenType::LeftParen)? {
+            let args = self.parse_args()?;
+            expr = Expr::Call { callee: expr.into(), args }
+        }
+
+        Ok(expr)
     }
 
     fn primary(&mut self) -> Result<Expr, ParseError> {
@@ -380,6 +391,26 @@ impl Parser {
 
         self.consume(TokenType::RightParen, ErrorMessage::ExpectedChar(')'))?;
         Ok(params)
+    }
+
+    fn parse_args(&mut self) -> Result<Vec<Expr>, ParseError> {
+        let mut args = Vec::new();
+        self.consume(TokenType::LeftParen, ErrorMessage::ExpectedChar('('))?;
+
+        if !self.check(TokenType::RightParen)? {
+            loop {
+                args.push(self.expression()?);
+
+                if self.check(TokenType::RightParen)? {
+                    break
+                } else {
+                    self.consume(TokenType::Comma, ErrorMessage::ExpectedChar(','))?;
+                }
+            }
+        }
+
+        self.consume(TokenType::RightParen, ErrorMessage::ExpectedChar(')'))?;
+        Ok(args)
     }
 
     // Helper methods
